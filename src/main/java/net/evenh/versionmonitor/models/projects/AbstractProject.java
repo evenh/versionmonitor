@@ -18,6 +18,9 @@ public abstract class AbstractProject implements Project {
   private String identifier;
   private List<Release> releases;
 
+  public AbstractProject(){
+  }
+
   public AbstractProject(String identifier) {
     this.identifier = identifier;
   }

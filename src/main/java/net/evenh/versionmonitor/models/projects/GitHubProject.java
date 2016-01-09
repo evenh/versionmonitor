@@ -26,6 +26,9 @@ public class GitHubProject extends AbstractProject {
 
   private GitHubService service;
 
+  public GitHubProject(){
+  }
+
   /**
    * Constructs a new software project hosted on GitHub.
    *
