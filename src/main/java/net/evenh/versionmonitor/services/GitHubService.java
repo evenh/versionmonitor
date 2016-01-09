@@ -61,7 +61,7 @@ public class GitHubService {
    *                                  unrelated to the OAuth2 token.
    */
   @PostConstruct
-  public void connect() throws IllegalArgumentException, IOException {
+  private void connect() throws IllegalArgumentException, IOException {
     if (authToken == null || authToken.isEmpty()) {
       throw new IllegalArgumentException("No GitHub OAuth2 token exists");
     }
