@@ -1,7 +1,5 @@
 package net.evenh.versionmonitor;
 
-import net.evenh.versionmonitor.models.Project;
-import net.evenh.versionmonitor.models.projects.GitHubProject;
 import net.evenh.versionmonitor.services.GitHubService;
 
 import org.slf4j.Logger;
@@ -26,9 +24,5 @@ public class App {
     SpringApplication.run(App.class, args);
 
     logger.info("Version monitor running - ready for work");
-
-    // Testing
-    Project swift = new GitHubProject("spring-projects/spring-boot");
-    logger.info("swift-info: {}", swift);
   }
 }
