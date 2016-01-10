@@ -6,16 +6,42 @@ import net.evenh.versionmonitor.models.Release;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+
 /**
  * A default project which shall be extended.
  *
  * @author Even Holthe
  * @since 2016-01-09
  */
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class AbstractProject implements Project {
+  @Id
+  @GeneratedValue(strategy = GenerationType.TABLE)
+  private Long id;
+
+  @NotNull
   private String name;
-  private Optional<String> description = Optional.empty();
+
+  @Column(nullable = true)
+  private String description;
+
+  @NotNull
   private String identifier;
+
+  @OneToMany(cascade = CascadeType.ALL)
+  @JoinColumn(name = "project_id")
   private List<Release> releases;
 
   public AbstractProject(){
@@ -23,6 +49,10 @@ public abstract class AbstractProject implements Project {
 
   public AbstractProject(String identifier) {
     this.identifier = identifier;
+  }
+
+  public Long getId() {
+    return id;
   }
 
   @Override
@@ -36,15 +66,15 @@ public abstract class AbstractProject implements Project {
 
   @Override
   public Optional<String> getDescription() {
-    return description;
+    return Optional.ofNullable(description);
   }
 
   public void setDescription(Optional<String> description) {
-    this.description = description;
+    this.description = description.get();
   }
 
   public void setDescription(String description) {
-    setDescription(Optional.ofNullable(description));
+    this.description = description;
   }
 
   @Override
@@ -67,8 +97,9 @@ public abstract class AbstractProject implements Project {
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName() + "{" + "name='" + name + '\''
-            + ", description='" + description.orElse(null) + '\''
+    return this.getClass().getSimpleName() + "{" + "id='" + id + '\''
+            + ", name='" + name + '\''
+            + ", description='" + description + '\''
             + ", identifier='" + identifier + '\''
             + ", releases=" + releases
             + '}';

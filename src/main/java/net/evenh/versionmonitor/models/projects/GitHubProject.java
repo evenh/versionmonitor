@@ -1,5 +1,6 @@
 package net.evenh.versionmonitor.models.projects;
 
+import net.evenh.versionmonitor.models.Project;
 import net.evenh.versionmonitor.models.Release;
 import net.evenh.versionmonitor.services.GitHubService;
 
@@ -14,6 +15,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 /**
  * Implements a GitHub software project.
  *
@@ -21,9 +26,12 @@ import java.util.stream.Collectors;
  * @since 2016-01-09
  */
 @Component
-public class GitHubProject extends AbstractProject {
+@Entity
+@Table(name = "projects_github")
+public class GitHubProject extends AbstractProject implements Project {
   private static final Logger logger = LoggerFactory.getLogger(GitHubProject.class);
 
+  @Transient
   private GitHubService service;
 
   public GitHubProject(){

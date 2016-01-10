@@ -3,7 +3,13 @@ package net.evenh.versionmonitor.models;
 import org.kohsuke.github.GHRelease;
 import org.kohsuke.github.GHTag;
 
-import java.util.Optional;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 /**
  * Represents a release.
@@ -11,13 +17,28 @@ import java.util.Optional;
  * @author Even Holthe
  * @since 2016-01-09
  */
+@Entity
+@Table(name = "releases")
 public class Release {
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
+
+  @NotNull
   private String version;
+
+  @NotNull
   private String url;
-  private Optional<Boolean> prerelease;
+
+  @Column(nullable = true)
+  private Boolean prerelease;
 
   private Release() {
-    this.prerelease = Optional.empty();
+    this.prerelease = null;
+  }
+
+  public Long getId() {
+    return id;
   }
 
   public String getVersion() {
@@ -36,24 +57,19 @@ public class Release {
     this.url = url;
   }
 
-  public Optional<Boolean> isPrerelease() {
+  public Boolean isPrerelease() {
     return prerelease;
   }
 
-  private void setPrerelease(Optional<Boolean> prerelease) {
+  private void setPrerelease(Boolean prerelease) {
     this.prerelease = prerelease;
-  }
-
-  public void setPrerelease(boolean isPrerelease) {
-    setPrerelease(Optional.of(isPrerelease));
   }
 
   @Override
   public String toString() {
-    String preRelease = (prerelease.isPresent() ? prerelease.get().toString() : "N/A");
-
-    return "Release{" + "version='" + version + '\''
-            + ", prerelease='" + preRelease + '\''
+    return "Release{" + "id='" + id + '\''
+            + ", version='" + version + '\''
+            + ", prerelease='" + prerelease + '\''
             + ", url='" + url + '\''
             + '}';
   }
@@ -65,7 +81,7 @@ public class Release {
   public static class ReleaseBuilder {
     private String version;
     private String url;
-    private Optional<Boolean> prerelease;
+    private Boolean prerelease;
 
     private ReleaseBuilder() {
     }
@@ -84,13 +100,8 @@ public class Release {
       return this;
     }
 
-    public ReleaseBuilder withPrerelease(Optional<Boolean> prerelease) {
+    public ReleaseBuilder withPrerelease(Boolean prerelease) {
       this.prerelease = prerelease;
-      return this;
-    }
-
-    public ReleaseBuilder withPrerelease(boolean prerelease) {
-      this.prerelease = Optional.ofNullable(prerelease);
       return this;
     }
 
@@ -102,7 +113,7 @@ public class Release {
     public ReleaseBuilder fromGitHub(GHTag tag, String identifier) {
       this.version = tag.getName();
       this.url = "https://github.com/" + identifier + "/releases/tag/" + this.version;
-      this.prerelease = Optional.empty();
+      this.prerelease = null;
 
       return this;
     }
@@ -115,7 +126,7 @@ public class Release {
     public ReleaseBuilder fromGitHub(GHRelease release) {
       this.version = release.getTagName();
       this.url = release.getHtmlUrl().toString();
-      this.prerelease = Optional.of(release.isPrerelease());
+      this.prerelease = release.isPrerelease();
 
       return this;
     }
