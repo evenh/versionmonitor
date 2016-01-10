@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.persistence.Entity;
@@ -48,18 +47,12 @@ public class GitHubProject extends AbstractProject implements Project {
     service = GitHubService.getInstance();
 
     try {
-      // Fetch repository using GitHubService.
-      Optional<GHRepository> repo = service.getRepository(getIdentifier());
-
-      // Unwrap the optional if present
-      if (repo.isPresent()) {
-        GHRepository repository = repo.get();
-
-        // Populate the data object
-        this.setName(repository.getName());
-        this.setDescription(repository.getDescription());
-        this.setReleases(populateReleases(repository));
-      }
+      // Fetch repository using GitHubService and unwrap the optional if present
+      service.getRepository(getIdentifier()).ifPresent(repository -> {
+        setName(repository.getName());
+        setDescription(repository.getDescription());
+        setReleases(populateReleases(repository));
+      });
     } catch (IllegalArgumentException e) {
       logger.warn("Illegal arguments were supplied to the GitHubService", e);
     } catch (Exception e) {
