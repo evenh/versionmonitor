@@ -1,15 +1,23 @@
 package net.evenh.versionmonitor.services;
 
+import com.squareup.okhttp.Cache;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.OkUrlFactory;
+
 import org.kohsuke.github.GHRateLimit;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
+import org.kohsuke.github.GitHubBuilder;
+import org.kohsuke.github.extras.OkHttpConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
@@ -28,6 +36,9 @@ public class GitHubService {
   @Value("${github.oauthToken}")
   private String authToken;
   private GitHub service;
+
+  @Value("${github.cache.size}")
+  private Integer cacheSize;
 
   private final Pattern matcher = Pattern.compile("^[a-z0-9-_]+/[a-z0-9-_]+$",
           Pattern.CASE_INSENSITIVE);
@@ -67,7 +78,17 @@ public class GitHubService {
     }
 
     try {
-      service = GitHub.connectUsingOAuth(authToken);
+      // Set up caching
+      File cacheDir = new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
+      Cache cache = new Cache(cacheDir, cacheSize * 1024 * 1024);
+
+      service = GitHubBuilder
+              .fromEnvironment()
+              .withOAuthToken(authToken)
+              .withConnector(new OkHttpConnector(
+                      new OkUrlFactory(new OkHttpClient().setCache(cache))
+              ))
+              .build();
     } catch (IOException e) {
       logger.warn("Caught exception while connecting to GitHub", e);
       throw e;
