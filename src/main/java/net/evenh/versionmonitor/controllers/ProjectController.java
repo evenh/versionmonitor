@@ -57,6 +57,11 @@ public class ProjectController {
     }
 
     if (command.getHost().equals("github")) {
+      // Check for duplicates
+      if(repository.findByIdentifier(command.getIdentifier()).isPresent()) {
+        return new ResponseEntity("Project already exists", HttpStatus.CONFLICT);
+      }
+
       AbstractProject project = new GitHubProject(command.getIdentifier());
       return new ResponseEntity(repository.saveAndFlush(project), HttpStatus.CREATED);
     }
