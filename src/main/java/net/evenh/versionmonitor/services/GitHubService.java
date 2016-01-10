@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
@@ -105,8 +106,10 @@ public class GitHubService {
    *         Contains metadata and releases amongst other data.
    * @throws IllegalArgumentException Thrown if a malformed project identifier is provided as the
    *                                  input argument.
+   * @throws FileNotFoundException Thrown if the repository does not exist.
    */
-  public Optional<GHRepository> getRepository(String ownerRepo) throws IllegalArgumentException {
+  public Optional<GHRepository> getRepository(String ownerRepo) throws IllegalArgumentException,
+          FileNotFoundException {
     logger.debug("Repository identifier: {}", ownerRepo);
 
     if (ownerRepo == null || ownerRepo.isEmpty()) {
@@ -117,6 +120,9 @@ public class GitHubService {
 
     try {
       return Optional.ofNullable(service.getRepository(ownerRepo));
+    } catch (FileNotFoundException e) {
+      logger.info("GitHub repository does not exist: {}", ownerRepo);
+      throw e;
     } catch (IOException e) {
       logger.warn("Got exception while fetching repository", e);
     }

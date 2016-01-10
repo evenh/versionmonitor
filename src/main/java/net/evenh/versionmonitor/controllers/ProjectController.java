@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -58,12 +59,19 @@ public class ProjectController {
 
     if (command.getHost().equals("github")) {
       // Check for duplicates
-      if(repository.findByIdentifier(command.getIdentifier()).isPresent()) {
+      if (repository.findByIdentifier(command.getIdentifier()).isPresent()) {
         return new ResponseEntity("Project already exists", HttpStatus.CONFLICT);
       }
 
-      AbstractProject project = new GitHubProject(command.getIdentifier());
-      return new ResponseEntity(repository.saveAndFlush(project), HttpStatus.CREATED);
+      try {
+        AbstractProject saved = repository.saveAndFlush(new GitHubProject(command.getIdentifier()));
+        return new ResponseEntity(saved, HttpStatus.CREATED);
+      } catch (FileNotFoundException nfe) {
+        return new ResponseEntity("No GitHub project exists with that name", HttpStatus.NOT_FOUND);
+      } catch (Exception e) {
+        logger.warn("Got exception while adding new project", e);
+        return new ResponseEntity("Failed to create project", HttpStatus.INTERNAL_SERVER_ERROR);
+      }
     }
 
     return new ResponseEntity("Not processed. I only know github projects for now.", HttpStatus.OK);

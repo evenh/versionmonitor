@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +42,9 @@ public class GitHubProject extends AbstractProject implements Project {
    *
    * @param identifier  A username and project in this form: <code>apple/swift</code> for
    *                    describing the repository located at https://github.com/apple/swift
+   * @throws FileNotFoundException Thrown if the project does not exist.
    */
-  public GitHubProject(String identifier) {
+  public GitHubProject(String identifier) throws FileNotFoundException {
     super(identifier);
     service = GitHubService.getInstance();
 
@@ -55,6 +57,9 @@ public class GitHubProject extends AbstractProject implements Project {
       });
     } catch (IllegalArgumentException e) {
       logger.warn("Illegal arguments were supplied to the GitHubService", e);
+    } catch (FileNotFoundException e) {
+      logger.warn("Project not found: {}", identifier);
+      throw e;
     } catch (Exception e) {
       logger.warn("Encountered problems using the GitHub service", e);
     }
