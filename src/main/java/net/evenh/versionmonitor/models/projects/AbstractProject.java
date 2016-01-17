@@ -25,7 +25,7 @@ import javax.validation.constraints.NotNull;
  * @since 2016-01-09
  */
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class AbstractProject implements Project {
   @Id
   @GeneratedValue(strategy = GenerationType.TABLE)
