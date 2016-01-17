@@ -1,7 +1,13 @@
 package net.evenh.versionmonitor.models;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.kohsuke.github.GHRelease;
 import org.kohsuke.github.GHTag;
+
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +15,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -32,6 +40,10 @@ public class Release {
 
   @Column(nullable = true)
   private Boolean prerelease;
+
+  @CreationTimestamp
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date createdAt;
 
   private Release() {
     this.prerelease = null;
@@ -65,12 +77,19 @@ public class Release {
     this.prerelease = prerelease;
   }
 
+  public String getCreatedAt() {
+    return ZonedDateTime
+            .ofInstant(createdAt.toInstant(), ZoneId.systemDefault())
+            .format(DateTimeFormatter.ISO_INSTANT);
+  }
+
   @Override
   public String toString() {
     return "Release{" + "id='" + id + '\''
             + ", version='" + version + '\''
             + ", prerelease='" + prerelease + '\''
             + ", url='" + url + '\''
+            + ", createdAt='" + getCreatedAt() + '\''
             + '}';
   }
 
