@@ -77,6 +77,11 @@ public class Release {
     this.prerelease = prerelease;
   }
 
+  /**
+   * Gets the timestamp of when this project was inserted into the database.
+   *
+   * @return The insertion date in the database as a ISO 8601 string.
+   */
   public String getCreatedAt() {
     return ZonedDateTime
             .ofInstant(createdAt.toInstant(), ZoneId.systemDefault())

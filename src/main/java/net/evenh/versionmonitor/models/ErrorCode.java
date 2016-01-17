@@ -3,7 +3,7 @@ package net.evenh.versionmonitor.models;
 import org.springframework.http.HttpStatus;
 
 /**
- * Different error codes used througout the system.
+ * Different error codes used throughout the system.
  *
  * @author Even Holthe
  * @since 2016-01-17

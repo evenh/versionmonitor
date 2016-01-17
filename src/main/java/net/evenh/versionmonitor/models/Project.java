@@ -1,7 +1,6 @@
 package net.evenh.versionmonitor.models;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * The software project interface specifies how to interact
@@ -21,7 +20,7 @@ public interface Project {
    *
    * <p><i>Note that all hosts may not have this information.</i>
    */
-  Optional<String> getDescription();
+  String getDescription();
 
   /**
    * A unique identifier to identify this project with the host.
