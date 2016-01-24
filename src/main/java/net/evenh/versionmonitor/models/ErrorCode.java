@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
  * @author Even Holthe
  * @since 2016-01-17
  */
+@SuppressWarnings("CheckStyle")
 public enum ErrorCode {
   PROJECT_NOT_FOUND
           (1, "The requested project was not found.", HttpStatus.NOT_FOUND),
