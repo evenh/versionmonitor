@@ -9,6 +9,7 @@ import java.util.Optional;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -40,7 +41,7 @@ public abstract class AbstractProject implements Project {
   @NotNull
   private String identifier;
 
-  @OneToMany(cascade = CascadeType.ALL)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   @JoinColumn(name = "project_id")
   private List<Release> releases;
 
@@ -96,12 +97,16 @@ public abstract class AbstractProject implements Project {
   }
 
   @Override
+  public void addRelease(Release release) {
+    releases.add(release);
+  }
+
+  @Override
   public String toString() {
     return this.getClass().getSimpleName() + "{" + "id='" + id + '\''
             + ", name='" + name + '\''
             + ", description='" + description + '\''
             + ", identifier='" + identifier + '\''
-            + ", releases=" + releases
             + '}';
   }
 }

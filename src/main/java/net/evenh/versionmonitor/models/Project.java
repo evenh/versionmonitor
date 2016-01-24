@@ -33,4 +33,11 @@ public interface Project {
    * Returns a list of releases for this software project.
    */
   List<Release> getReleases();
+
+  /**
+   * Add a release to the list of releases.
+   *
+   * @param release A <code>Release</code> object.
+   */
+  public void addRelease(Release release);
 }
