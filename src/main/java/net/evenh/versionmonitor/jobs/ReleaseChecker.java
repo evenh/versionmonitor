@@ -34,7 +34,7 @@ public class ReleaseChecker {
   /**
    * Performs the actual checking for new releases at a scheduled interval.
    */
-  @Scheduled(fixedRate = 10_000)
+  @Scheduled(cron = "${versionmonitor.scheduling.cron}")
   public void check() {
     List<AbstractProject> projects = repository.findAll();
 
