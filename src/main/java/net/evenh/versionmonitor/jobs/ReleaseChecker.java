@@ -40,6 +40,7 @@ public class ReleaseChecker {
 
     if (projects.isEmpty()) {
       logger.info("No projects found, skipping checks");
+      return;
     }
 
     projects.forEach(project -> {
