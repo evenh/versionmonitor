@@ -1,4 +1,6 @@
-package net.evenh.versionmonitor.models;
+package net.evenh.versionmonitor.models.projects;
+
+import net.evenh.versionmonitor.models.Release;
 
 import java.util.List;
 
@@ -39,5 +41,12 @@ public interface Project {
    *
    * @param release A <code>Release</code> object.
    */
-  public void addRelease(Release release);
+  void addRelease(Release release);
+
+  /**
+   * Returns the URL of this project on a given host.
+   *
+   * @return The URL to the project on a host.
+   */
+  String getUrl();
 }
