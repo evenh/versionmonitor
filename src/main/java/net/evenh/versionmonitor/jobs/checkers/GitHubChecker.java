@@ -1,10 +1,11 @@
 package net.evenh.versionmonitor.jobs.checkers;
 
-import net.evenh.versionmonitor.models.Project;
 import net.evenh.versionmonitor.models.Release;
 import net.evenh.versionmonitor.models.projects.AbstractProject;
 import net.evenh.versionmonitor.models.projects.GitHubProject;
+import net.evenh.versionmonitor.models.projects.Project;
 import net.evenh.versionmonitor.repositories.ProjectRepository;
+import net.evenh.versionmonitor.repositories.ReleaseRepository;
 import net.evenh.versionmonitor.services.GitHubService;
 
 import org.kohsuke.github.GHRateLimit;
@@ -39,11 +40,14 @@ public class GitHubChecker implements CheckerJob {
   private ProjectRepository repository;
 
   @Autowired
+  private ReleaseRepository releases;
+
+  @Autowired
   @Qualifier("gitHubService")
   private GitHubService service;
 
   private GitHubProject project;
-  private String indentedPrefix;
+  private String logPrefix;
 
   @Value("${github.ratelimit.buffer}")
   private Integer rateLimitBuffer;
@@ -54,7 +58,7 @@ public class GitHubChecker implements CheckerJob {
   private boolean init(Project project) {
     if (project instanceof GitHubProject) {
       this.project = (GitHubProject) project;
-      this.indentedPrefix = "\t[" + project.getIdentifier() + "]: ";
+      this.logPrefix = this.getClass().getSimpleName() + "[" + project.getIdentifier() + "]: ";
 
       return true;
     }
@@ -69,19 +73,19 @@ public class GitHubChecker implements CheckerJob {
     if (rl.isPresent()) {
       GHRateLimit rateLimit = rl.get();
 
-      logger.debug(indentedPrefix + "{}/{} calls performed", rateLimit.remaining, rateLimit.limit);
-      logger.debug(indentedPrefix + "Rate limit will be reset on {}", rateLimit.getResetDate());
+      logger.debug(logPrefix + "{}/{} calls performed", rateLimit.remaining, rateLimit.limit);
+      logger.debug(logPrefix + "Rate limit will be reset on {}", rateLimit.getResetDate());
 
       int callsLeft = rateLimit.limit - (rateLimit.remaining - rateLimitBuffer);
 
       if (callsLeft <= 0) {
-        logger.info(indentedPrefix + "No GitHub calls remaining. No new release checks will be "
+        logger.info(logPrefix + "No GitHub calls remaining. No new release checks will be "
                 + "attempted before {} has occured", rateLimit.remaining, rateLimit.getResetDate());
 
         return true;
       }
     } else {
-      logger.warn(indentedPrefix + "Could not get rate limit information! Cancelling future calls");
+      logger.warn(logPrefix + "Could not get rate limit information! Cancelling future calls");
       return true;
     }
 
@@ -94,7 +98,7 @@ public class GitHubChecker implements CheckerJob {
       throw new IllegalArgumentException("Project is not a GitHub project: " + project);
     }
 
-    logger.info(indentedPrefix + "Checking for new releases");
+    logger.debug(logPrefix + "Checking for new releases");
 
     List<Release> newReleases = new ArrayList<>();
 
@@ -111,17 +115,20 @@ public class GitHubChecker implements CheckerJob {
       Optional<GHRepository> repo = service.getRepository(project.getIdentifier());
 
       if (!repo.isPresent()) {
-        logger.warn(indentedPrefix + "Could not read fetch repo from database. Returning!");
+        logger.warn(logPrefix + "Could not read fetch repo from database. Returning!");
         return newReleases;
       } else {
         repo.ifPresent(ghRepo -> {
           try {
             ghRepo.listTags().forEach(tag -> {
               if (!existingReleases.contains(tag.getName())) {
-                newReleases.add(Release.ReleaseBuilder.builder()
+                Release newRelease = Release.ReleaseBuilder.builder()
                         .fromGitHub(tag, project.getIdentifier())
-                        .build()
-                );
+                        .build();
+
+                releases.saveAndFlush(newRelease);
+
+                newReleases.add(newRelease);
               }
             });
 
@@ -131,16 +138,16 @@ public class GitHubChecker implements CheckerJob {
               repository.save((AbstractProject) project);
             }
           } catch (IOException e) {
-            logger.warn(indentedPrefix + "Got exception while fetching tags", e);
+            logger.warn(logPrefix + "Got exception while fetching tags", e);
           }
         });
       }
 
     } catch (FileNotFoundException e) {
-      logger.warn(indentedPrefix + "Project does not exist. Removed or bad access rights?");
+      logger.warn(logPrefix + "Project does not exist. Removed or bad access rights?");
     }
 
-    logger.info(indentedPrefix + "Found {} new releases", newReleases.size());
+    logger.debug(logPrefix + "Found {} new releases", newReleases.size());
     return newReleases;
   }
 }

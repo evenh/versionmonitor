@@ -1,7 +1,7 @@
 package net.evenh.versionmonitor.jobs.checkers;
 
-import net.evenh.versionmonitor.models.Project;
 import net.evenh.versionmonitor.models.Release;
+import net.evenh.versionmonitor.models.projects.Project;
 
 import java.util.List;
 
