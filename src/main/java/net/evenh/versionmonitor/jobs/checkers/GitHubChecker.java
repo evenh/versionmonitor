@@ -108,7 +108,7 @@ public class GitHubChecker implements CheckerJob {
 
     List<String> existingReleases = project.getReleases()
             .stream()
-            .map(release -> release.getVersion())
+            .map(Release::getVersion)
             .collect(Collectors.toList());
 
     try {

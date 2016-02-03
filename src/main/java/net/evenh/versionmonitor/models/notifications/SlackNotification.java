@@ -26,7 +26,7 @@ public class SlackNotification implements Notification {
   private static final Logger logger = LoggerFactory.getLogger(SlackNotification.class);
 
   @Autowired
-  ProjectRepository projects;
+  private ProjectRepository projects;
 
   @Value("${notifications.slack.botname}")
   private String botname;

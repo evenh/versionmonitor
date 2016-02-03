@@ -70,8 +70,6 @@ public class ReleaseChecker {
     s.setIdentifier("https://hooks.slack.com/services/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");
     s.setName("Koderiet-org");
 
-    newReleases.forEach(release -> {
-      slack.sendNotification(release, s);
-    });
+    newReleases.forEach(release -> slack.sendNotification(release, s));
   }
 }
