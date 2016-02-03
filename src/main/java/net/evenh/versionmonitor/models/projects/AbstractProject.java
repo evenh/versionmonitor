@@ -1,6 +1,5 @@
 package net.evenh.versionmonitor.models.projects;
 
-import net.evenh.versionmonitor.models.Project;
 import net.evenh.versionmonitor.models.Release;
 
 import java.util.List;

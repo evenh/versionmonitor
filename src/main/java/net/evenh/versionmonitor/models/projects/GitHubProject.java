@@ -1,6 +1,5 @@
 package net.evenh.versionmonitor.models.projects;
 
-import net.evenh.versionmonitor.models.Project;
 import net.evenh.versionmonitor.models.Release;
 import net.evenh.versionmonitor.services.GitHubService;
 
@@ -86,5 +85,10 @@ public class GitHubProject extends AbstractProject implements Project {
     }
 
     return releases;
+  }
+
+  @Override
+  public String getUrl() {
+    return "https://github.com/" + getIdentifier();
   }
 }

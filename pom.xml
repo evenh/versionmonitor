@@ -77,6 +77,13 @@
             <version>1.72</version>
         </dependency>
 
+        <!-- Notifications -->
+        <dependency>
+            <groupId>net.gpedro.integrations.slack</groupId>
+            <artifactId>slack-webhook</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
         <!-- Utils -->
         <dependency>
             <groupId>com.google.guava</groupId>
