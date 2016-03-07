@@ -28,7 +28,7 @@ public class SlackNotification implements Notification {
   @Autowired
   private ProjectRepository projects;
 
-  @Value("${notifications.slack.botname}")
+  @Value("${versionmonitor.notifications.slack.botname}")
   private String botname;
 
   @Override
