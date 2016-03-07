@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * @author Even Holthe
  * @since 2016-01-17
  */
-@Component
+@Component("gitHubChecker")
 @Transactional
 public class GitHubChecker implements CheckerJob {
   private static final Logger logger = LoggerFactory.getLogger(GitHubChecker.class);
@@ -52,7 +52,7 @@ public class GitHubChecker implements CheckerJob {
   @Value("${github.ratelimit.buffer}")
   private Integer rateLimitBuffer;
 
-  public GitHubChecker() {
+  private GitHubChecker() {
   }
 
   private boolean init(Project project) {
@@ -93,7 +93,7 @@ public class GitHubChecker implements CheckerJob {
   }
 
   @Override
-  public List<Release> checkAndUpdate(Project project) throws IllegalArgumentException {
+  public List<Release> check(Project project) throws IllegalArgumentException {
     if (!init(project)) {
       throw new IllegalArgumentException("Project is not a GitHub project: " + project);
     }

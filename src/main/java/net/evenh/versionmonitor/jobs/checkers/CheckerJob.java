@@ -17,5 +17,5 @@ public interface CheckerJob {
    *
    * @return The new releases found.
    */
-  List<Release> checkAndUpdate(Project project) throws IllegalArgumentException;
+  List<Release> check(Project project) throws IllegalArgumentException;
 }

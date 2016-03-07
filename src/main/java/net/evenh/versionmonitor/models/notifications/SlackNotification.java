@@ -71,7 +71,7 @@ public class SlackNotification implements Notification {
               + release.getUrl()
               + "|" + release.getVersion()
               + "> of <"
-              + project.getUrl()
+              + project.getProjectUrl()
               + "|"
               + project.getName()
               + "> is available";

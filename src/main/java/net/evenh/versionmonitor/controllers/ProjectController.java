@@ -6,6 +6,7 @@ import net.evenh.versionmonitor.models.ErrorCode;
 import net.evenh.versionmonitor.models.projects.AbstractProject;
 import net.evenh.versionmonitor.models.projects.GitHubProject;
 import net.evenh.versionmonitor.repositories.ProjectRepository;
+import net.evenh.versionmonitor.services.ProjectBuilderService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -37,6 +39,9 @@ public class ProjectController {
 
   @Autowired
   private ProjectRepository repository;
+
+  @Autowired
+  private ProjectBuilderService projectBuilder;
 
   private ErrorCode error;
 
@@ -71,23 +76,29 @@ public class ProjectController {
       return new ResponseEntity<>(result.getAllErrors(), HttpStatus.BAD_REQUEST);
     }
 
-    if (command.getHost().equals("github")) {
-      // Check for duplicates
-      if (repository.findByIdentifier(command.getIdentifier()).isPresent()) {
-        logger.info("Project '{}' does already exist in the database", command.getIdentifier());
-        return errorOf(ErrorCode.DUPLICATE_PROJECT);
-      }
+    switch (command.getHost()) {
+      case "github":
+        // Check for duplicates
+        if (repository.findByIdentifier(command.getIdentifier()).isPresent()) {
+          logger.info("Project '{}' does already exist in the database", command.getIdentifier());
+          return errorOf(ErrorCode.DUPLICATE_PROJECT);
+        }
 
-      try {
-        AbstractProject saved = repository.saveAndFlush(new GitHubProject(command.getIdentifier()));
-        logger.info("Successfully added project: {}", saved);
-        return new ResponseEntity<>(saved, HttpStatus.CREATED);
-      } catch (FileNotFoundException nfe) {
-        return errorOf(ErrorCode.HOST_UNKNOWN_PROJECT);
-      } catch (Exception e) {
-        logger.warn("Got exception while adding new project", e);
-        return errorOf(ErrorCode.ERROR_CREATING_PROJECT);
-      }
+        try {
+          Optional<GitHubProject> project = projectBuilder.gitHub(command.getIdentifier());
+
+          if(project.isPresent()) {
+            GitHubProject saved = repository.saveAndFlush(project.get());
+            logger.info("Successfully added project: {}", saved);
+            return new ResponseEntity<>(saved, HttpStatus.CREATED);
+          }
+        } catch (FileNotFoundException nfe) {
+          return errorOf(ErrorCode.HOST_UNKNOWN_PROJECT);
+        } catch (Exception e) {
+          logger.warn("Got exception while adding new project", e);
+          return errorOf(ErrorCode.ERROR_CREATING_PROJECT);
+        }
+        break;
     }
 
     return errorOf(ErrorCode.UNKNOWN_PROJECT_TYPE);
@@ -133,8 +144,7 @@ public class ProjectController {
    * Creates a <code>ResponseEntity</code> for a given <code>ErrorCode</code>.
    *
    * @param error A <code>ErrorCode</code>.
-   * @return A populated <code>ResponseEntity</code> containing an
-   *        <code>ErrorMessageComposite</code>.
+   * @return A populated <code>ResponseEntity</code> containing an <code>ErrorMessageComposite</code>.
    */
   private ResponseEntity errorOf(ErrorCode error) {
     return new ResponseEntity<>(ErrorMessageComposite.of(error), error.getHttpStatus());

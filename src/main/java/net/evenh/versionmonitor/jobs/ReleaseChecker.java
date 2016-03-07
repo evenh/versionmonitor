@@ -54,7 +54,7 @@ public class ReleaseChecker {
 
     projects.forEach(project -> {
       if (project instanceof GitHubProject) {
-        List<Release> releases = github.checkAndUpdate(project);
+        List<Release> releases = github.check(project);
 
         if (!releases.isEmpty()) {
           releases.forEach(newReleases::add);

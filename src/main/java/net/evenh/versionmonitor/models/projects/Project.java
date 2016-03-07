@@ -5,8 +5,8 @@ import net.evenh.versionmonitor.models.Release;
 import java.util.List;
 
 /**
- * The software project interface specifies how to interact
- * with a specific host where a software project is hosted.
+ * The software project interface specifies how to interact with a specific host where a software
+ * project is hosted.
  *
  * @author Even Holthe
  * @since 2016-01-09
@@ -48,5 +48,5 @@ public interface Project {
    *
    * @return The URL to the project on a host.
    */
-  String getUrl();
+  String getProjectUrl();
 }

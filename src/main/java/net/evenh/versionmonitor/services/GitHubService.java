@@ -11,6 +11,7 @@ import org.kohsuke.github.GitHubBuilder;
 import org.kohsuke.github.extras.OkHttpConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -21,21 +22,19 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import javax.annotation.PostConstruct;
-
 /**
  * GitHub service is responsible for communicating with GitHub, including monitoring rate limits.
  *
  * @author Even Holthe
  * @since 2016-01-09
  */
-@Service("GitHubService")
-public class GitHubService {
-  private static GitHubService instance;
+@Service("gitHubService")
+public class GitHubService implements InitializingBean {
   private static final Logger logger = LoggerFactory.getLogger(GitHubService.class);
 
   @Value("${github.oauthToken}")
   private String authToken;
+
   private GitHub service;
 
   @Value("${github.cache.size}")
@@ -44,24 +43,7 @@ public class GitHubService {
   private final Pattern matcher = Pattern.compile("^[a-z0-9-_]+/[a-z0-9-_]+$",
           Pattern.CASE_INSENSITIVE);
 
-  /**
-   * Gets an instance of GitHubService or creates the initial instance if not already available.
-   */
-  public static GitHubService getInstance() {
-    if (instance == null) {
-      logger.info("No instance of GitHubService exists. Instantiating one.");
-      instance = new GitHubService();
-    }
-
-    return instance;
-  }
-
-  /**
-   * Private constructor for singleton creation.
-   *
-   * @see GitHubService#connect()
-   */
-  private GitHubService() {
+  private GitHubService(){
   }
 
   /**
@@ -72,10 +54,10 @@ public class GitHubService {
    * @throws IOException              Thrown if there is problems communicating with GitHub
    *                                  unrelated to the OAuth2 token.
    */
-  @PostConstruct
-  private void connect() throws IllegalArgumentException, IOException {
+  @Override
+  public void afterPropertiesSet() throws IllegalArgumentException, IOException {
     if (authToken == null || authToken.isEmpty()) {
-      throw new IllegalArgumentException("No GitHub OAuth2 token exists");
+      throw new IllegalArgumentException("Missing GitHub OAuth2 token");
     }
 
     try {
@@ -90,10 +72,13 @@ public class GitHubService {
                       new OkUrlFactory(new OkHttpClient().setCache(cache))
               ))
               .build();
+
     } catch (IOException e) {
       logger.warn("Caught exception while connecting to GitHub", e);
       throw e;
     }
+
+    logger.info("GitHub service up and running");
   }
 
 
