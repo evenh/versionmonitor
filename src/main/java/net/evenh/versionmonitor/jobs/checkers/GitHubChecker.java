@@ -6,7 +6,7 @@ import net.evenh.versionmonitor.models.projects.GitHubProject;
 import net.evenh.versionmonitor.models.projects.Project;
 import net.evenh.versionmonitor.repositories.ProjectRepository;
 import net.evenh.versionmonitor.repositories.ReleaseRepository;
-import net.evenh.versionmonitor.services.GitHubService;
+import net.evenh.versionmonitor.services.hosts.GitHubService;
 
 import org.kohsuke.github.GHRateLimit;
 import org.kohsuke.github.GHRepository;

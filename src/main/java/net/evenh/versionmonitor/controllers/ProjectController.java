@@ -1,12 +1,12 @@
 package net.evenh.versionmonitor.controllers;
 
+import net.evenh.versionmonitor.HostRegistry;
 import net.evenh.versionmonitor.commands.AddProjectCommand;
 import net.evenh.versionmonitor.composites.ErrorMessageComposite;
 import net.evenh.versionmonitor.models.ErrorCode;
 import net.evenh.versionmonitor.models.projects.AbstractProject;
-import net.evenh.versionmonitor.models.projects.GitHubProject;
 import net.evenh.versionmonitor.repositories.ProjectRepository;
-import net.evenh.versionmonitor.services.ProjectBuilderService;
+import net.evenh.versionmonitor.services.HostService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,8 +39,7 @@ public class ProjectController {
   @Autowired
   private ProjectRepository repository;
 
-  @Autowired
-  private ProjectBuilderService projectBuilder;
+  HostRegistry registry = HostRegistry.getInstance();
 
   private ErrorCode error;
 
@@ -76,29 +74,26 @@ public class ProjectController {
       return new ResponseEntity<>(result.getAllErrors(), HttpStatus.BAD_REQUEST);
     }
 
-    switch (command.getHost()) {
-      case "github":
+    // Loop through hosts and process request
+    for (String hostname : registry.getHosts()) {
+      if (hostname.equalsIgnoreCase(command.getHost())) {
+
         // Check for duplicates
         if (repository.findByIdentifier(command.getIdentifier()).isPresent()) {
           logger.info("Project '{}' does already exist in the database", command.getIdentifier());
           return errorOf(ErrorCode.DUPLICATE_PROJECT);
         }
 
-        try {
-          Optional<GitHubProject> project = projectBuilder.gitHub(command.getIdentifier());
+        HostService service = registry.getHostService(hostname).get();
+        Optional<? extends AbstractProject> project = service.getProject(command.getIdentifier());
 
-          if(project.isPresent()) {
-            GitHubProject saved = repository.saveAndFlush(project.get());
-            logger.info("Successfully added project: {}", saved);
-            return new ResponseEntity<>(saved, HttpStatus.CREATED);
-          }
-        } catch (FileNotFoundException nfe) {
-          return errorOf(ErrorCode.HOST_UNKNOWN_PROJECT);
-        } catch (Exception e) {
-          logger.warn("Got exception while adding new project", e);
-          return errorOf(ErrorCode.ERROR_CREATING_PROJECT);
+        if (project.isPresent()) {
+          AbstractProject saved = repository.saveAndFlush(project.get());
+          logger.info("Successfully added project: {}", saved);
+          return new ResponseEntity<>(saved, HttpStatus.CREATED);
         }
-        break;
+
+      }
     }
 
     return errorOf(ErrorCode.UNKNOWN_PROJECT_TYPE);

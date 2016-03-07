@@ -1,8 +1,13 @@
-package net.evenh.versionmonitor.services;
+package net.evenh.versionmonitor.services.hosts;
 
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
+
+import net.evenh.versionmonitor.HostRegistry;
+import net.evenh.versionmonitor.models.Release;
+import net.evenh.versionmonitor.models.projects.GitHubProject;
+import net.evenh.versionmonitor.services.HostService;
 
 import org.kohsuke.github.GHRateLimit;
 import org.kohsuke.github.GHRepository;
@@ -18,9 +23,12 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * GitHub service is responsible for communicating with GitHub, including monitoring rate limits.
@@ -29,7 +37,7 @@ import java.util.regex.Pattern;
  * @since 2016-01-09
  */
 @Service("gitHubService")
-public class GitHubService implements InitializingBean {
+public class GitHubService implements HostService, InitializingBean {
   private static final Logger logger = LoggerFactory.getLogger(GitHubService.class);
 
   @Value("${github.oauthToken}")
@@ -43,7 +51,9 @@ public class GitHubService implements InitializingBean {
   private final Pattern matcher = Pattern.compile("^[a-z0-9-_]+/[a-z0-9-_]+$",
           Pattern.CASE_INSENSITIVE);
 
-  private GitHubService(){
+  private GitHubService() {
+    HostRegistry registry = HostRegistry.getInstance();
+    registry.register(this);
   }
 
   /**
@@ -88,10 +98,10 @@ public class GitHubService implements InitializingBean {
    * @param ownerRepo A username and project in this form: <code>apple/swift</code> for describing
    *                  the repository located at https://github.com/apple/swift.
    * @return A populated <code>GHRepository</code> object with data about the requested repository.
-   *         Contains metadata and releases amongst other data.
+   * Contains metadata and releases amongst other data.
    * @throws IllegalArgumentException Thrown if a malformed project identifier is provided as the
    *                                  input argument.
-   * @throws FileNotFoundException Thrown if the repository does not exist.
+   * @throws FileNotFoundException    Thrown if the repository does not exist.
    */
   public Optional<GHRepository> getRepository(String ownerRepo) throws IllegalArgumentException,
           FileNotFoundException {
@@ -129,5 +139,58 @@ public class GitHubService implements InitializingBean {
     }
 
     return Optional.empty();
+  }
+
+  @Override
+  public Optional<GitHubProject> getProject(String identifier) {
+    try {
+      final GitHubProject project = new GitHubProject();
+
+      getRepository(identifier).ifPresent(repository -> {
+        project.setIdentifier(identifier);
+        project.setName(repository.getName());
+        project.setDescription(repository.getDescription());
+        project.setReleases(populateGitHubReleases(repository, identifier));
+      });
+
+      return Optional.of(project);
+    } catch (IllegalArgumentException e) {
+      logger.warn("Illegal arguments were supplied to the GitHubService", e);
+    } catch (FileNotFoundException e) {
+      logger.warn("Project not found: {}", identifier);
+    } catch (Exception e) {
+      logger.warn("Encountered problems using the GitHub service", e);
+    }
+
+    return Optional.empty();
+  }
+
+  @Override
+  public String getHostIdentifier() {
+    return "github";
+  }
+
+  /**
+   * Processes a repository and creates domain releases.
+   *
+   * @param repository A GitHub repository
+   * @param identifier The identifier with GitHub.
+   * @return A list of releases, which may be empty
+   */
+  private List<Release> populateGitHubReleases(GHRepository repository, String identifier) {
+    List<Release> releases = new ArrayList<>();
+
+    try {
+      Release.ReleaseBuilder mapper = Release.ReleaseBuilder.builder();
+
+      releases = repository.listTags().asList()
+              .stream()
+              .map(tag -> mapper.fromGitHub(tag, identifier).build())
+              .collect(Collectors.toList());
+    } catch (IOException e) {
+      logger.warn("Encountered IOException while populating GitHub releases", e);
+    }
+
+    return releases;
   }
 }
