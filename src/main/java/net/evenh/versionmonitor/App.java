@@ -6,7 +6,6 @@ import net.evenh.versionmonitor.services.GitHubService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -26,16 +25,14 @@ public class App {
     logger.info("Version monitor running - ready for work");
   }
 
-  @Bean
-  @Qualifier("gitHubService")
+  @Bean(name = "gitHubService")
   public GitHubService gitHubService() {
     return GitHubService.getInstance();
   }
 
   // Release checker beans
 
-  @Bean
-  @Qualifier("gitHubChecker")
+  @Bean(name = "gitHubChecker")
   public CheckerJob gitHubChecker() {
     return new GitHubChecker();
   }
