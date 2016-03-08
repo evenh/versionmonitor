@@ -39,7 +39,8 @@ public class ProjectController {
   @Autowired
   private ProjectRepository repository;
 
-  HostRegistry registry = HostRegistry.getInstance();
+  @Autowired
+  HostRegistry registry;
 
   private ErrorCode error;
 

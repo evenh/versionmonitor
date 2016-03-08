@@ -1,17 +1,15 @@
 package net.evenh.versionmonitor.jobs;
 
-import net.evenh.versionmonitor.jobs.checkers.CheckerJob;
+import net.evenh.versionmonitor.HostRegistry;
 import net.evenh.versionmonitor.models.Release;
 import net.evenh.versionmonitor.models.Subscription;
 import net.evenh.versionmonitor.models.notifications.SlackNotification;
 import net.evenh.versionmonitor.models.projects.AbstractProject;
-import net.evenh.versionmonitor.models.projects.GitHubProject;
 import net.evenh.versionmonitor.repositories.ProjectRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -32,8 +30,7 @@ public class ReleaseChecker {
   private ProjectRepository repository;
 
   @Autowired
-  @Qualifier("gitHubChecker")
-  private CheckerJob github;
+  private HostRegistry registry;
 
   @Autowired
   private SlackNotification slack;
@@ -50,19 +47,19 @@ public class ReleaseChecker {
       return;
     }
 
-    List<Release> newReleases = new ArrayList<>();
+    final List<Release> releases = new ArrayList<>();
 
     projects.forEach(project -> {
-      if (project instanceof GitHubProject) {
-        List<Release> releases = github.check(project);
-
-        if (!releases.isEmpty()) {
-          releases.forEach(newReleases::add);
+      registry.forProject(project).ifPresent(host -> {
+        try {
+          host.check(project).stream().forEach(releases::add);
+        } catch (Exception e) {
+          e.printStackTrace();
         }
-      }
+      });
     });
 
-    logger.info("Found a total of {} new releases", newReleases.size());
+    logger.info("Found a total of {} new releases", releases.size());
 
     // TODO: Not have static hook
     Subscription s = new Subscription();
@@ -70,6 +67,6 @@ public class ReleaseChecker {
     s.setIdentifier("https://hooks.slack.com/services/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");
     s.setName("Koderiet-org");
 
-    newReleases.forEach(release -> slack.sendNotification(release, s));
+    releases.forEach(release -> slack.sendNotification(release, s));
   }
 }

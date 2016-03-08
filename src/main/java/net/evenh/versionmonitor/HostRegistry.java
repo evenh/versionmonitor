@@ -1,6 +1,11 @@
 package net.evenh.versionmonitor;
 
+import net.evenh.versionmonitor.models.projects.AbstractProject;
 import net.evenh.versionmonitor.services.HostService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,15 +18,12 @@ import java.util.Set;
  * @author Even Holthe
  * @since 2016-03-07
  */
+@Component
 public class HostRegistry {
-  private static HostRegistry instance;
+  private static final Logger logger = LoggerFactory.getLogger(HostRegistry.class);
   private final Map<String, HostService> registry = new HashMap<>();
 
-  public static synchronized HostRegistry getInstance() {
-    if (instance == null) {
-      instance = new HostRegistry();
-    }
-    return instance;
+  private HostRegistry() {
   }
 
   public synchronized Optional<HostService> getHostService(final String hostIdentifier) {
@@ -50,5 +52,15 @@ public class HostRegistry {
 
   private boolean isRegistrered(final String hostIdentifier) {
     return registry.containsKey(hostIdentifier);
+  }
+
+  public Optional<HostService> forProject(AbstractProject project) {
+    for (HostService host : registry.values()) {
+      if (host.satisfiedBy(project)) {
+        return Optional.of(host);
+      }
+    }
+
+    return Optional.empty();
   }
 }
