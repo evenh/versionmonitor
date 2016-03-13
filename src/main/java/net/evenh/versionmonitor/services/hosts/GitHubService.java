@@ -35,6 +35,8 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static net.evenh.versionmonitor.models.Release.ReleaseBuilder;
+
 /**
  * GitHub service is responsible for communicating with GitHub, including monitoring rate limits.
  *
@@ -64,9 +66,6 @@ public class GitHubService implements HostService, InitializingBean {
   private Integer cacheSize;
 
   private GitHub gitHub;
-
-  private final Pattern matcher = Pattern.compile("^[a-z0-9-_]+/[a-z0-9-_]+$",
-          Pattern.CASE_INSENSITIVE);
 
   private GitHubService() {
   }
@@ -103,6 +102,7 @@ public class GitHubService implements HostService, InitializingBean {
       throw e;
     }
 
+    // Register GitHubService with the host registry
     registry.register(this);
 
     logger.info("GitHub service up and running");
@@ -126,7 +126,7 @@ public class GitHubService implements HostService, InitializingBean {
 
     if (ownerRepo == null || ownerRepo.isEmpty()) {
       throw new IllegalArgumentException("GitHub repository identifier is missing");
-    } else if (!matcher.matcher(ownerRepo).matches()) {
+    } else if (!validIdentifier(ownerRepo)) {
       throw new IllegalArgumentException("Illegal GitHub repository identifier: " + ownerRepo);
     }
 
@@ -149,8 +149,7 @@ public class GitHubService implements HostService, InitializingBean {
    */
   public Optional<GHRateLimit> getRateLimit() {
     try {
-      GHRateLimit rateLimit = gitHub.getRateLimit();
-      return rateLimit == null ? Optional.empty() : Optional.of(rateLimit);
+      return Optional.ofNullable(gitHub.getRateLimit());
     } catch (IOException e) {
       logger.warn("Got exception while requesting rate limit", e);
     }
@@ -161,16 +160,21 @@ public class GitHubService implements HostService, InitializingBean {
   @Override
   public Optional<GitHubProject> getProject(String identifier) {
     try {
-      final GitHubProject project = new GitHubProject();
+      Optional<GHRepository> repoMaybe = getRepository(identifier);
 
-      getRepository(identifier).ifPresent(repository -> {
+      if (repoMaybe.isPresent()) {
+        final GHRepository repo = repoMaybe.get();
+        final GitHubProject project = new GitHubProject();
+
         project.setIdentifier(identifier);
-        project.setName(repository.getName());
-        project.setDescription(repository.getDescription());
-        project.setReleases(populateGitHubReleases(repository, identifier));
-      });
+        project.setName(repo.getName());
+        project.setDescription(repo.getDescription());
+        project.setReleases(populateGitHubReleases(repo, identifier));
 
-      return Optional.of(project);
+        return Optional.of(project);
+      }
+
+      return Optional.empty();
     } catch (IllegalArgumentException e) {
       logger.warn("Illegal arguments were supplied to the GitHubService", e);
     } catch (FileNotFoundException e) {
@@ -180,6 +184,14 @@ public class GitHubService implements HostService, InitializingBean {
     }
 
     return Optional.empty();
+  }
+
+  @Override
+  public boolean validIdentifier(String identifier) {
+    final Pattern matcher = Pattern.compile("^[a-z0-9-_]+/[a-z0-9-_]+$",
+            Pattern.CASE_INSENSITIVE);
+
+    return matcher.matcher(identifier).matches();
   }
 
   @Override
@@ -204,8 +216,7 @@ public class GitHubService implements HostService, InitializingBean {
       return newReleases;
     }
 
-    List<String> existingReleases = project.getReleases()
-            .stream()
+    List<String> existingReleases = project.getReleases().stream()
             .map(Release::getVersion)
             .collect(Collectors.toList());
 
@@ -220,7 +231,7 @@ public class GitHubService implements HostService, InitializingBean {
           try {
             ghRepo.listTags().forEach(tag -> {
               if (!existingReleases.contains(tag.getName())) {
-                Release newRelease = Release.ReleaseBuilder.builder()
+                Release newRelease = ReleaseBuilder.builder()
                         .fromGitHub(tag, project.getIdentifier())
                         .build();
 
@@ -230,11 +241,8 @@ public class GitHubService implements HostService, InitializingBean {
               }
             });
 
-            if (!newReleases.isEmpty()) {
-              newReleases.forEach(project::addRelease);
-
-              repository.save((AbstractProject) project);
-            }
+            newReleases.forEach(project::addRelease);
+            repository.save(project);
           } catch (IOException e) {
             logger.warn(prefix + "Got exception while fetching tags", e);
           }
@@ -254,6 +262,9 @@ public class GitHubService implements HostService, InitializingBean {
     return "github";
   }
 
+  /**
+   * Utility method to check if the rate limit is reached and log a bunch in the process.
+   */
   private boolean hasReachedRateLimit() {
     // Check rate limit
     Optional<GHRateLimit> rl = getRateLimit();
@@ -291,7 +302,7 @@ public class GitHubService implements HostService, InitializingBean {
     List<Release> releases = new ArrayList<>();
 
     try {
-      Release.ReleaseBuilder mapper = Release.ReleaseBuilder.builder();
+      Release.ReleaseBuilder mapper = ReleaseBuilder.builder();
 
       releases = repository.listTags().asList()
               .stream()

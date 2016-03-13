@@ -54,7 +54,7 @@ public class ReleaseChecker {
         try {
           host.check(project).stream().forEach(releases::add);
         } catch (Exception e) {
-          e.printStackTrace();
+          logger.warn("Got exception while checking for updates for {}", project, e);
         }
       });
     });
