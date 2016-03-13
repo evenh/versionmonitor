@@ -49,15 +49,13 @@ public class ReleaseChecker {
 
     final List<Release> releases = new ArrayList<>();
 
-    projects.forEach(project -> {
-      registry.forProject(project).ifPresent(host -> {
-        try {
-          host.check(project).stream().forEach(releases::add);
-        } catch (Exception e) {
-          logger.warn("Got exception while checking for updates for {}", project, e);
-        }
-      });
-    });
+    projects.forEach(project -> registry.forProject(project).ifPresent(host -> {
+      try {
+        host.check(project).stream().forEach(releases::add);
+      } catch (Exception e) {
+        logger.warn("Got exception while checking for updates for {}", project, e);
+      }
+    }));
 
     logger.info("Found a total of {} new releases", releases.size());
 

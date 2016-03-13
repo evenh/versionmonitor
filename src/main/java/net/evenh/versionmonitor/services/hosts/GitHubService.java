@@ -115,7 +115,7 @@ public class GitHubService implements HostService, InitializingBean {
    * @param ownerRepo A username and project in this form: <code>apple/swift</code> for describing
    *                  the repository located at https://github.com/apple/swift.
    * @return A populated <code>GHRepository</code> object with data about the requested repository.
-   * Contains metadata and releases amongst other data.
+   *         Contains metadata and releases amongst other data.
    * @throws IllegalArgumentException Thrown if a malformed project identifier is provided as the
    *                                  input argument.
    * @throws FileNotFoundException    Thrown if the repository does not exist.
@@ -279,7 +279,7 @@ public class GitHubService implements HostService, InitializingBean {
 
       if (callsLeft <= 0) {
         logger.info("No GitHub calls remaining. No new release checks will be "
-                + "attempted before {} has occured", rateLimit.remaining, rateLimit.getResetDate());
+                + "attempted before {} has occurred", rateLimit.remaining, rateLimit.getResetDate());
 
         return true;
       }

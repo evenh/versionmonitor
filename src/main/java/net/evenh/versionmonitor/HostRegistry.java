@@ -26,8 +26,13 @@ public class HostRegistry {
   private HostRegistry() {
   }
 
+  /**
+   * Gets a particular host service by it's identifier.
+   *
+   * @param hostIdentifier The unique host identifier.
+   */
   public synchronized Optional<HostService> getHostService(final String hostIdentifier) {
-    if (isRegistrered(hostIdentifier)) {
+    if (isRegistered(hostIdentifier)) {
       return Optional.of(registry.get(hostIdentifier));
     }
 
@@ -50,7 +55,7 @@ public class HostRegistry {
     return registry.keySet();
   }
 
-  private boolean isRegistrered(final String hostIdentifier) {
+  private boolean isRegistered(final String hostIdentifier) {
     return registry.containsKey(hostIdentifier);
   }
 
