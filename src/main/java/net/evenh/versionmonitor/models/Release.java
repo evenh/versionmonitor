@@ -1,9 +1,9 @@
 package net.evenh.versionmonitor.models;
 
-import org.hibernate.annotations.CreationTimestamp;
 import org.kohsuke.github.GHRelease;
 import org.kohsuke.github.GHTag;
 
+import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -15,8 +15,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -41,8 +39,7 @@ public class Release {
   @Column(nullable = true)
   private Boolean prerelease;
 
-  @CreationTimestamp
-  @Temporal(TemporalType.TIMESTAMP)
+  @Column(nullable = false)
   private Date createdAt;
 
   private Release() {
@@ -77,6 +74,10 @@ public class Release {
     this.prerelease = prerelease;
   }
 
+  public void setCreatedAt(Date createdAt) {
+    this.createdAt = createdAt;
+  }
+
   /**
    * Gets the timestamp of when this project was inserted into the database.
    *
@@ -106,6 +107,7 @@ public class Release {
     private String version;
     private String url;
     private Boolean prerelease;
+    private Date createdAt;
 
     private ReleaseBuilder() {
     }
@@ -129,6 +131,11 @@ public class Release {
       return this;
     }
 
+    public ReleaseBuilder withCreatedAt(Date createdAt) {
+      this.createdAt = createdAt;
+      return this;
+    }
+
     /**
      * Populates all necessary fields using a GitHub tag.
      *
@@ -138,6 +145,11 @@ public class Release {
       this.version = tag.getName();
       this.url = "https://github.com/" + identifier + "/releases/tag/" + this.version;
       this.prerelease = null;
+      try {
+        this.createdAt = tag.getCommit().getCommitShortInfo().getCommitter().getDate();
+      } catch (IOException e) {
+        this.createdAt = new Date(0);
+      }
 
       return this;
     }
@@ -151,6 +163,11 @@ public class Release {
       this.version = release.getTagName();
       this.url = release.getHtmlUrl().toString();
       this.prerelease = release.isPrerelease();
+      try {
+        this.createdAt = release.getCreatedAt();
+      } catch (IOException e) {
+        this.createdAt = new Date(0);
+      }
 
       return this;
     }
@@ -165,6 +182,7 @@ public class Release {
       release.setVersion(version);
       release.setUrl(url);
       release.setPrerelease(prerelease);
+      release.setCreatedAt(createdAt);
 
       return release;
     }
