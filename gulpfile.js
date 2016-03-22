@@ -1,4 +1,3 @@
-// Generated on 2016-03-22 using generator-jhipster 2.27.2
 /* jshint camelcase: false */
 'use strict';
 
@@ -23,7 +22,6 @@ var gulp = require('gulp'),
     runSequence = require('run-sequence'),
     browserSync = require('browser-sync'),
     sourcemaps = require('gulp-sourcemaps'),
-    KarmaServer = require('karma').Server,
     plumber = require('gulp-plumber'),
     changed = require('gulp-changed'),
     cache = require('gulp-cached'),
@@ -33,7 +31,6 @@ var gulp = require('gulp'),
 var config = {
     app: 'src/main/webapp/',
     dist: 'src/main/webapp/dist/',
-    test: 'src/test/javascript/',
     importPath: 'src/main/webapp/bower_components',
     scss: 'src/main/scss/',
     port: 9000,
@@ -45,16 +42,13 @@ gulp.task('clean', function () {
     return del([config.dist]);
 });
 
-gulp.task('test', ['wiredep:test', 'ngconstant:dev'], function(done) {
-    new KarmaServer({
-        configFile: __dirname + '/' + config.test + 'karma.conf.js',
-        singleRun: true
-    }, done).start();
+gulp.task('test', ['ngconstant:dev'], function(done) {
+    return console.log('Frontend tests not implemented');
 });
 
 
 gulp.task('copy', function() {
-    return es.merge( 
+    return es.merge(
         gulp.src(config.app + 'bower_components/bootstrap/fonts/*.*')
         .pipe(plumber({errorHandler: handleErrors}))
         .pipe(changed(config.dist + 'assets/fonts/'))
@@ -167,7 +161,7 @@ gulp.task('watch', function() {
     gulp.watch([config.app + '*.html', config.app + 'scripts/**', config.app + 'i18n/**']).on('change', browserSync.reload);
 });
 
-gulp.task('wiredep', ['wiredep:test', 'wiredep:app']);
+gulp.task('wiredep', ['wiredep:app']);
 
 gulp.task('wiredep:app', function () {
     var stream = gulp.src(config.app + 'index.html')
@@ -187,28 +181,6 @@ gulp.task('wiredep:app', function () {
             ignorePath: /\.\.\/webapp\/bower_components\// // remove ../webapp/bower_components/ from paths of injected sass files
         }))
         .pipe(gulp.dest(config.scss)));
-});
-
-gulp.task('wiredep:test', function () {
-    return gulp.src(config.test + 'karma.conf.js')
-        .pipe(plumber({errorHandler: handleErrors}))
-        .pipe(wiredep({
-            exclude: [/angular-i18n/, /angular-scenario/],
-            ignorePath: /\.\.\/\.\.\//, // remove ../../ from paths of injected javascripts
-            devDependencies: true,
-            fileTypes: {
-                js: {
-                    block: /(([\s\t]*)\/\/\s*bower:*(\S*))(\n|\r|.)*?(\/\/\s*endbower)/gi,
-                    detect: {
-                        js: /'(.*\.js)'/gi
-                    },
-                    replace: {
-                        js: '\'{{filePath}}\','
-                    }
-                }
-            }
-        }))
-        .pipe(gulp.dest(config.test));
 });
 
 gulp.task('build', function (cb) {
