@@ -1,0 +1,24 @@
+{
+    "name": "versionmonitor",
+    "version": "0.0.1",
+    "appPath": "src/main/webapp",
+    "dependencies": {
+        "angular": "1.5.0",
+        "angular-bootstrap": "1.2.5",
+        "angular-cache-buster": "0.4.3",
+        "angular-cookies": "1.5.0",
+        "angular-local-storage": "0.2.5",
+        "angular-loading-bar": "0.8.0",
+        "angular-resource": "1.5.0",
+        "angular-sanitize": "1.5.0",
+        "angular-ui-router": "0.2.18",
+        "bootstrap-sass": "3.3.6",
+        "jquery": "2.2.1",
+        "swagger-ui": "2.1.4"
+    },
+    "resolutions": {
+        "angular": "1.5.0",
+        "angular-cookies": "1.5.0",
+        "jquery": "2.2.1"
+    }
+}

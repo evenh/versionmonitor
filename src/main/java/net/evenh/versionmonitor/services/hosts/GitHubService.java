@@ -5,9 +5,9 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
 
 import net.evenh.versionmonitor.HostRegistry;
-import net.evenh.versionmonitor.models.Release;
-import net.evenh.versionmonitor.models.projects.AbstractProject;
-import net.evenh.versionmonitor.models.projects.GitHubProject;
+import net.evenh.versionmonitor.domain.Release;
+import net.evenh.versionmonitor.domain.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.projects.GitHubProject;
 import net.evenh.versionmonitor.repositories.ProjectRepository;
 import net.evenh.versionmonitor.repositories.ReleaseRepository;
 import net.evenh.versionmonitor.services.HostService;
@@ -35,7 +35,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static net.evenh.versionmonitor.models.Release.ReleaseBuilder;
+import static net.evenh.versionmonitor.domain.Release.ReleaseBuilder;
 
 /**
  * GitHub service is responsible for communicating with GitHub, including monitoring rate limits.

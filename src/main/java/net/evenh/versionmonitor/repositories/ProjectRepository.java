@@ -1,7 +1,7 @@
 package net.evenh.versionmonitor.repositories;
 
-import net.evenh.versionmonitor.models.Release;
-import net.evenh.versionmonitor.models.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.Release;
+import net.evenh.versionmonitor.domain.projects.AbstractProject;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

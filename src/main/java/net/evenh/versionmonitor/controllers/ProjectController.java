@@ -3,8 +3,8 @@ package net.evenh.versionmonitor.controllers;
 import net.evenh.versionmonitor.HostRegistry;
 import net.evenh.versionmonitor.commands.AddProjectCommand;
 import net.evenh.versionmonitor.composites.ErrorMessageComposite;
-import net.evenh.versionmonitor.models.ErrorCode;
-import net.evenh.versionmonitor.models.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.ErrorCode;
+import net.evenh.versionmonitor.domain.projects.AbstractProject;
 import net.evenh.versionmonitor.repositories.ProjectRepository;
 import net.evenh.versionmonitor.services.HostService;
 

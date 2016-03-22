@@ -1,6 +1,6 @@
 package net.evenh.versionmonitor.repositories;
 
-import net.evenh.versionmonitor.models.Release;
+import net.evenh.versionmonitor.domain.Release;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

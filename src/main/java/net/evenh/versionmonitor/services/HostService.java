@@ -1,7 +1,7 @@
 package net.evenh.versionmonitor.services;
 
-import net.evenh.versionmonitor.models.Release;
-import net.evenh.versionmonitor.models.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.Release;
+import net.evenh.versionmonitor.domain.projects.AbstractProject;
 
 import java.util.List;
 import java.util.Optional;

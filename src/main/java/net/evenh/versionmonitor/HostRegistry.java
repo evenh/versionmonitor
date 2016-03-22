@@ -1,6 +1,6 @@
 package net.evenh.versionmonitor;
 
-import net.evenh.versionmonitor.models.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.projects.AbstractProject;
 import net.evenh.versionmonitor.services.HostService;
 
 import org.slf4j.Logger;

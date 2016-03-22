@@ -1,6 +1,6 @@
 package net.evenh.versionmonitor.composites;
 
-import net.evenh.versionmonitor.models.ErrorCode;
+import net.evenh.versionmonitor.domain.ErrorCode;
 
 import java.io.Serializable;
 

@@ -1,10 +1,10 @@
 package net.evenh.versionmonitor.jobs;
 
 import net.evenh.versionmonitor.HostRegistry;
-import net.evenh.versionmonitor.models.Release;
-import net.evenh.versionmonitor.models.Subscription;
-import net.evenh.versionmonitor.models.notifications.SlackNotification;
-import net.evenh.versionmonitor.models.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.Release;
+import net.evenh.versionmonitor.domain.Subscription;
+import net.evenh.versionmonitor.domain.notifications.SlackNotification;
+import net.evenh.versionmonitor.domain.projects.AbstractProject;
 import net.evenh.versionmonitor.repositories.ProjectRepository;
 
 import org.slf4j.Logger;
