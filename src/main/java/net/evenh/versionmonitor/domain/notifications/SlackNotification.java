@@ -1,5 +1,6 @@
 package net.evenh.versionmonitor.domain.notifications;
 
+import net.evenh.versionmonitor.config.VersionmonitorConfiguration;
 import net.evenh.versionmonitor.domain.Release;
 import net.evenh.versionmonitor.domain.Subscription;
 import net.evenh.versionmonitor.domain.projects.AbstractProject;
@@ -9,8 +10,8 @@ import net.gpedro.integrations.slack.SlackMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -22,14 +23,21 @@ import java.util.Optional;
  * @since 2016-02-03
  */
 @Component
-public class SlackNotification implements Notification {
+public class SlackNotification implements Notification, InitializingBean {
   private static final Logger logger = LoggerFactory.getLogger(SlackNotification.class);
+
+  @Autowired
+  private VersionmonitorConfiguration props;
 
   @Autowired
   private ProjectRepository projects;
 
-  @Value("${versionmonitor.notifications.slack.botname}")
   private String botname;
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    this.botname = props.getSlack().getBotname();
+  }
 
   @Override
   public boolean sendNotification(Release release, Subscription subscription) {

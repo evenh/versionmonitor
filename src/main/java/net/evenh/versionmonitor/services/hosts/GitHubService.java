@@ -5,6 +5,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
 
 import net.evenh.versionmonitor.HostRegistry;
+import net.evenh.versionmonitor.config.VersionmonitorConfiguration;
 import net.evenh.versionmonitor.domain.Release;
 import net.evenh.versionmonitor.domain.projects.AbstractProject;
 import net.evenh.versionmonitor.domain.projects.GitHubProject;
@@ -21,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -56,13 +56,13 @@ public class GitHubService implements HostService, InitializingBean {
   @Autowired
   private ReleaseRepository releases;
 
-  @Value("${github.oauthToken}")
+  @Autowired
+  private VersionmonitorConfiguration props;
+
   private String authToken;
 
-  @Value("${github.ratelimit.buffer}")
   private Integer rateLimitBuffer;
 
-  @Value("${github.cache.size}")
   private Integer cacheSize;
 
   private GitHub gitHub;
@@ -80,6 +80,10 @@ public class GitHubService implements HostService, InitializingBean {
    */
   @Override
   public void afterPropertiesSet() throws IllegalArgumentException, IOException {
+    this.authToken = props.getGithub().getOauthToken();
+    this.rateLimitBuffer = props.getGithub().getRatelimitBuffer();
+    this.cacheSize = props.getGithub().getCachesize();
+
     if (authToken == null || authToken.isEmpty()) {
       throw new IllegalArgumentException("Missing GitHub OAuth2 token");
     }

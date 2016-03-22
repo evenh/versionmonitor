@@ -15,10 +15,10 @@ public class AuthenticationProvider implements org.springframework.security.auth
 
   private PasswordEncoder passwordEncoder;
 
-  private UserDetailsService userDetailsService;
+  private UserDetailService userDetailService;
 
-  public AuthenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-    this.userDetailsService = userDetailsService;
+  public AuthenticationProvider(UserDetailService userDetailService, PasswordEncoder passwordEncoder) {
+    this.userDetailService = userDetailService;
     this.passwordEncoder = passwordEncoder;
   }
 
@@ -28,7 +28,7 @@ public class AuthenticationProvider implements org.springframework.security.auth
       (UsernamePasswordAuthenticationToken) authentication;
 
     String login = token.getName();
-    UserDetails user = userDetailsService.loadUserByUsername(login);
+    UserDetails user = userDetailService.loadUserByUsername(login);
     if (user == null) {
       throw new UsernameNotFoundException("User does not exists");
     }
