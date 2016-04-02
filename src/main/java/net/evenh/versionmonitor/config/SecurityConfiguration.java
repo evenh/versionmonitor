@@ -67,10 +67,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
       .headers()
       .frameOptions()
       .disable()
-      .and()
+    .and()
       .sessionManagement()
       .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-      .and()
+    .and()
       .authorizeRequests()
       .antMatchers("/api/register").permitAll()
       .antMatchers("/api/activate").permitAll()
@@ -97,7 +97,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
       .antMatchers("/configuration/ui").permitAll()
       .antMatchers("/swagger-ui/index.html").hasAuthority(AuthoritiesConstants.ADMIN)
       .antMatchers("/protected/**").authenticated()
-      .and()
+    .and()
       .apply(securityConfigurerAdapter());
 
   }

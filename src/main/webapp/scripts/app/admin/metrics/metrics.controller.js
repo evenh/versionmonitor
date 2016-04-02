@@ -49,7 +49,7 @@ angular.module('versionmonitorApp')
                     size: 'lg',
                     resolve: {
                         threadDump: function() {
-                            return data.content;
+                            return data;
                         }
 
                     }

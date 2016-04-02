@@ -32,7 +32,7 @@ public class UserDetailService implements UserDetailsService {
   @Override
   @Transactional
   public UserDetails loadUserByUsername(final String login) {
-    log.debug("Authenticating {}", login);
+    log.debug("Authenticating username: {}", login);
     String lowercaseLogin = login.toLowerCase();
     Optional<User> userFromDatabase = userRepository.findOneByLogin(lowercaseLogin);
     return userFromDatabase.map(user -> {

@@ -22,6 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.health.AbstractHealthIndicator;
+import org.springframework.boot.actuate.health.Health;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -44,7 +46,7 @@ import static net.evenh.versionmonitor.domain.Release.ReleaseBuilder;
  * @since 2016-01-09
  */
 @Service("gitHubService")
-public class GitHubService implements HostService, InitializingBean {
+public class GitHubService extends AbstractHealthIndicator implements HostService, InitializingBean {
   private static final Logger logger = LoggerFactory.getLogger(GitHubService.class);
 
   @Autowired
@@ -94,12 +96,12 @@ public class GitHubService implements HostService, InitializingBean {
       Cache cache = new Cache(cacheDir, cacheSize * 1024 * 1024);
 
       gitHub = GitHubBuilder
-              .fromEnvironment()
-              .withOAuthToken(authToken)
-              .withConnector(new OkHttpConnector(
-                      new OkUrlFactory(new OkHttpClient().setCache(cache))
-              ))
-              .build();
+        .fromEnvironment()
+        .withOAuthToken(authToken)
+        .withConnector(new OkHttpConnector(
+          new OkUrlFactory(new OkHttpClient().setCache(cache))
+        ))
+        .build();
 
     } catch (IOException e) {
       logger.warn("Caught exception while connecting to GitHub", e);
@@ -119,13 +121,13 @@ public class GitHubService implements HostService, InitializingBean {
    * @param ownerRepo A username and project in this form: <code>apple/swift</code> for describing
    *                  the repository located at https://github.com/apple/swift.
    * @return A populated <code>GHRepository</code> object with data about the requested repository.
-   *         Contains metadata and releases amongst other data.
+   * Contains metadata and releases amongst other data.
    * @throws IllegalArgumentException Thrown if a malformed project identifier is provided as the
    *                                  input argument.
    * @throws FileNotFoundException    Thrown if the repository does not exist.
    */
   public Optional<GHRepository> getRepository(final String ownerRepo) throws IllegalArgumentException,
-          FileNotFoundException {
+    FileNotFoundException {
     logger.debug("Repository identifier: {}", ownerRepo);
 
     if (ownerRepo == null || ownerRepo.isEmpty()) {
@@ -193,7 +195,7 @@ public class GitHubService implements HostService, InitializingBean {
   @Override
   public boolean validIdentifier(String identifier) {
     final Pattern matcher = Pattern.compile("^[a-z0-9-_]+/[a-z0-9-_]+$",
-            Pattern.CASE_INSENSITIVE);
+      Pattern.CASE_INSENSITIVE);
 
     return matcher.matcher(identifier).matches();
   }
@@ -221,8 +223,8 @@ public class GitHubService implements HostService, InitializingBean {
     }
 
     List<String> existingReleases = project.getReleases().stream()
-            .map(Release::getVersion)
-            .collect(Collectors.toList());
+      .map(Release::getVersion)
+      .collect(Collectors.toList());
 
     try {
       Optional<GHRepository> repo = getRepository(project.getIdentifier());
@@ -236,8 +238,8 @@ public class GitHubService implements HostService, InitializingBean {
             ghRepo.listTags().forEach(tag -> {
               if (!existingReleases.contains(tag.getName())) {
                 Release newRelease = ReleaseBuilder.builder()
-                        .fromGitHub(tag, project.getIdentifier())
-                        .build();
+                  .fromGitHub(tag, project.getIdentifier())
+                  .build();
 
                 releases.saveAndFlush(newRelease);
 
@@ -283,7 +285,7 @@ public class GitHubService implements HostService, InitializingBean {
 
       if (callsLeft <= 0) {
         logger.info("No GitHub calls remaining. No new release checks will be "
-                + "attempted before {} has occurred", rateLimit.remaining, rateLimit.getResetDate());
+          + "attempted before {} has occurred", rateLimit.remaining, rateLimit.getResetDate());
 
         return true;
       }
@@ -309,13 +311,32 @@ public class GitHubService implements HostService, InitializingBean {
       Release.ReleaseBuilder mapper = ReleaseBuilder.builder();
 
       releases = repository.listTags().asList()
-              .stream()
-              .map(tag -> mapper.fromGitHub(tag, identifier).build())
-              .collect(Collectors.toList());
+        .stream()
+        .map(tag -> mapper.fromGitHub(tag, identifier).build())
+        .collect(Collectors.toList());
     } catch (IOException e) {
       logger.warn("Encountered IOException while populating GitHub releases", e);
     }
 
     return releases;
+  }
+
+  /**
+   * Gives a health indication based on the remaining API calls available.
+   */
+  @Override
+  protected void doHealthCheck(Health.Builder builder) throws Exception {
+    getRateLimit().ifPresent(rateLimit -> {
+      builder.withDetail("buffer", rateLimitBuffer);
+      builder.withDetail("limit", rateLimit.limit);
+      builder.withDetail("remaining", rateLimit.remaining);
+      builder.withDetail("resetDate", rateLimit.getResetDate());
+    });
+
+    if (hasReachedRateLimit()) {
+      builder.down();
+    } else {
+      builder.up();
+    }
   }
 }
