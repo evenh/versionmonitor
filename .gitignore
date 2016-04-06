@@ -5,6 +5,8 @@ src/main/webapp/assets/styles/main.css
 src/main/webapp/dist
 src/main/webapp/bower_components
 app.constants.js
+/target/www/**
+
 
 ######################
 # Node
@@ -129,3 +131,8 @@ Desktop.ini
 # Maven Wrapper
 ######################
 !.mvn/wrapper/maven-wrapper.jar
+
+######################
+# ESLint
+######################
+.eslintcache

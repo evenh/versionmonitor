@@ -2,12 +2,13 @@ package net.evenh.versionmonitor.config;
 
 import net.evenh.versionmonitor.security.AuthoritiesConstants;
 import net.evenh.versionmonitor.security.Http401UnauthorizedEntryPoint;
-import net.evenh.versionmonitor.security.xauth.TokenProvider;
-import net.evenh.versionmonitor.security.xauth.XAuthTokenConfigurer;
+import net.evenh.versionmonitor.security.jwt.JWTConfigurer;
+import net.evenh.versionmonitor.security.jwt.TokenProvider;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -48,10 +49,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   @Override
   public void configure(WebSecurity web) throws Exception {
     web.ignoring()
-      .antMatchers("/scripts/**/*.{js,html}")
+      .antMatchers(HttpMethod.OPTIONS, "/**")
+      .antMatchers("/app/**/*.{js,html}")
       .antMatchers("/bower_components/**")
       .antMatchers("/i18n/**")
-      .antMatchers("/assets/**")
+      .antMatchers("/content/**")
       .antMatchers("/swagger-ui/index.html")
       .antMatchers("/test/**");
   }
@@ -61,7 +63,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     http
       .exceptionHandling()
       .authenticationEntryPoint(authenticationEntryPoint)
-      .and()
+    .and()
       .csrf()
       .disable()
       .headers()
@@ -90,7 +92,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
       .antMatchers("/info/**").hasAuthority(AuthoritiesConstants.ADMIN)
       .antMatchers("/autoconfig/**").hasAuthority(AuthoritiesConstants.ADMIN)
       .antMatchers("/env/**").hasAuthority(AuthoritiesConstants.ADMIN)
-      .antMatchers("/trace/**").hasAuthority(AuthoritiesConstants.ADMIN)
       .antMatchers("/mappings/**").hasAuthority(AuthoritiesConstants.ADMIN)
       .antMatchers("/liquibase/**").hasAuthority(AuthoritiesConstants.ADMIN)
       .antMatchers("/configuration/security").permitAll()
@@ -102,8 +103,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   }
 
-  private XAuthTokenConfigurer securityConfigurerAdapter() {
-    return new XAuthTokenConfigurer(userDetailService, tokenProvider);
+  private JWTConfigurer securityConfigurerAdapter() {
+    return new JWTConfigurer(tokenProvider);
   }
 
   @Bean

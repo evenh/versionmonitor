@@ -28,6 +28,8 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "vm_user")
 public class User extends AbstractAuditingEntity implements Serializable {
+  private static final long serialVersionUID = 1L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
@@ -52,11 +54,13 @@ public class User extends AbstractAuditingEntity implements Serializable {
   @Column(name = "last_name", length = 50)
   private String lastName;
 
+  @NotNull
   @Email
   @Size(max = 100)
   @Column(length = 100, unique = true)
   private String email;
 
+  @NotNull
   @Column(nullable = false)
   private boolean activated = false;
 
@@ -169,17 +173,21 @@ public class User extends AbstractAuditingEntity implements Serializable {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
+  public boolean equals(Object o) {
+    if (this == o) {
       return true;
     }
-    if (obj == null || getClass() != obj.getClass()) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
 
-    User user = (User) obj;
+    User user = (User) o;
 
-    return login.equals(user.login);
+    if (!login.equals(user.login)) {
+      return false;
+    }
+
+    return true;
   }
 
   @Override

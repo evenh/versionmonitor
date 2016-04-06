@@ -3,7 +3,7 @@ package net.evenh.versionmonitor.web.rest.util;
 import org.springframework.http.HttpHeaders;
 
 /**
- * Utility class for http header creation.
+ * Utility class for HTTP headers creation.
  */
 public class HeaderUtil {
   public static HttpHeaders createAlert(String message, String param) {

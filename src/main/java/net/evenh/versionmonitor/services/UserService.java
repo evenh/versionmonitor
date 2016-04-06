@@ -28,7 +28,6 @@ import java.util.Set;
 @Service
 @Transactional
 public class UserService {
-
   private final Logger log = LoggerFactory.getLogger(UserService.class);
 
   @Autowired
@@ -42,7 +41,7 @@ public class UserService {
 
   public Optional<User> activateRegistration(String key) {
     log.debug("Activating user for activation key {}", key);
-    userRepository.findOneByActivationKey(key)
+    return userRepository.findOneByActivationKey(key)
       .map(user -> {
         // activate given user for the registration key.
         user.setActivated(true);
@@ -51,7 +50,6 @@ public class UserService {
         log.debug("Activated user: {}", user);
         return user;
       });
-    return Optional.empty();
   }
 
   public Optional<User> completePasswordReset(String newPassword, String key) {
@@ -83,7 +81,6 @@ public class UserService {
   }
 
   public User createUserInformation(String login, String password, String firstName, String lastName, String email) {
-
     User newUser = new User();
     Authority authority = authorityRepository.findOne("ROLE_USER");
     Set<Authority> authorities = new HashSet<>();
@@ -111,7 +108,6 @@ public class UserService {
     user.setFirstName(managedUserDTO.getFirstName());
     user.setLastName(managedUserDTO.getLastName());
     user.setEmail(managedUserDTO.getEmail());
-
     if (managedUserDTO.getAuthorities() != null) {
       Set<Authority> authorities = new HashSet<>();
       managedUserDTO.getAuthorities().stream().forEach(
@@ -130,7 +126,7 @@ public class UserService {
   }
 
   public void updateUserInformation(String firstName, String lastName, String email) {
-    userRepository.findOneByLogin(SecurityUtils.getCurrentUser().getUsername()).ifPresent(u -> {
+    userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).ifPresent(u -> {
       u.setFirstName(firstName);
       u.setLastName(lastName);
       u.setEmail(email);
@@ -147,7 +143,7 @@ public class UserService {
   }
 
   public void changePassword(String password) {
-    userRepository.findOneByLogin(SecurityUtils.getCurrentUser().getUsername()).ifPresent(u -> {
+    userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).ifPresent(u -> {
       String encryptedPassword = passwordEncoder.encode(password);
       u.setPassword(encryptedPassword);
       userRepository.save(u);
@@ -172,21 +168,21 @@ public class UserService {
 
   @Transactional(readOnly = true)
   public User getUserWithAuthorities() {
-    User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUser().getUsername()).get();
+    User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).get();
     user.getAuthorities().size(); // eagerly load the association
     return user;
   }
 
   /**
-   * Not activated users should be automatically deleted after 3 days. <p/> <p> This is scheduled to
-   * get fired everyday, at 01:00 (am). </p>
+   * Not activated users should be automatically deleted after 3 days. <p> This is scheduled to get
+   * fired everyday, at 01:00 (am). </p>
    */
   @Scheduled(cron = "0 0 1 * * ?")
   public void removeNotActivatedUsers() {
     ZonedDateTime now = ZonedDateTime.now();
     List<User> users = userRepository.findAllByActivatedIsFalseAndCreatedDateBefore(now.minusDays(3));
     for (User user : users) {
-      log.info("Deleting not activated user {}", user.getLogin());
+      log.debug("Deleting not activated user {}", user.getLogin());
       userRepository.delete(user);
     }
   }

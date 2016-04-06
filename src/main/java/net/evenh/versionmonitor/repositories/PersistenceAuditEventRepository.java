@@ -2,6 +2,8 @@ package net.evenh.versionmonitor.repositories;
 
 import net.evenh.versionmonitor.domain.PersistentAuditEvent;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,5 +19,5 @@ public interface PersistenceAuditEventRepository extends JpaRepository<Persisten
 
   List<PersistentAuditEvent> findByPrincipalAndAuditEventDateAfter(String principal, LocalDateTime after);
 
-  List<PersistentAuditEvent> findAllByAuditEventDateBetween(LocalDateTime fromDate, LocalDateTime toDate);
+  Page<PersistentAuditEvent> findAllByAuditEventDateBetween(LocalDateTime fromDate, LocalDateTime toDate, Pageable pageable);
 }
