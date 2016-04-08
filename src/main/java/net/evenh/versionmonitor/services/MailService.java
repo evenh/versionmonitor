@@ -20,38 +20,27 @@ import java.util.Locale;
 import javax.mail.internet.MimeMessage;
 
 /**
- * Service for sending e-mails.
- * <p/>
- * <p>
- * We use the @Async annotation to send e-mails asynchronously.
+ * Service for sending e-mails. <p> We use the @Async annotation to send e-mails asynchronously.
  * </p>
  */
 @Service
 public class MailService {
-
   private final Logger log = LoggerFactory.getLogger(MailService.class);
 
   @Autowired
   private VersionmonitorConfiguration props;
 
-  @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   private JavaMailSenderImpl javaMailSender;
 
   @Autowired
   private MessageSource messageSource;
 
-  @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   private SpringTemplateEngine templateEngine;
 
-  /**
-   * System default email address that sends the e-mails.
-   */
-  private String from;
-
   @Async
-  public void sendEmail(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
+  private void sendEmail(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
     log.debug("Send e-mail[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
       isMultipart, isHtml, to, subject, content);
 
@@ -73,7 +62,8 @@ public class MailService {
   @Async
   public void sendActivationEmail(User user, String baseUrl) {
     log.debug("Sending activation e-mail to '{}'", user.getEmail());
-    Locale locale = Locale.getDefault();
+
+    Locale locale = Locale.ENGLISH;
     Context context = new Context(locale);
     context.setVariable("user", user);
     context.setVariable("baseUrl", baseUrl);
@@ -85,7 +75,7 @@ public class MailService {
   @Async
   public void sendCreationEmail(User user, String baseUrl) {
     log.debug("Sending creation e-mail to '{}'", user.getEmail());
-    Locale locale = Locale.getDefault();
+    Locale locale = Locale.ENGLISH;
     Context context = new Context(locale);
     context.setVariable("user", user);
     context.setVariable("baseUrl", baseUrl);
@@ -97,7 +87,7 @@ public class MailService {
   @Async
   public void sendPasswordResetMail(User user, String baseUrl) {
     log.debug("Sending password reset e-mail to '{}'", user.getEmail());
-    Locale locale = Locale.getDefault();
+    Locale locale = Locale.ENGLISH;
     Context context = new Context(locale);
     context.setVariable("user", user);
     context.setVariable("baseUrl", baseUrl);
