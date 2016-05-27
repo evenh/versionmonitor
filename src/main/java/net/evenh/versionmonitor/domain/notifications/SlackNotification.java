@@ -1,6 +1,6 @@
 package net.evenh.versionmonitor.domain.notifications;
 
-import net.evenh.versionmonitor.config.VersionmonitorConfiguration;
+import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
 import net.evenh.versionmonitor.domain.Release;
 import net.evenh.versionmonitor.domain.Subscription;
 import net.evenh.versionmonitor.domain.projects.AbstractProject;

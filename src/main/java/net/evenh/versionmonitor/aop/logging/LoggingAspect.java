@@ -1,6 +1,6 @@
 package net.evenh.versionmonitor.aop.logging;
 
-import net.evenh.versionmonitor.config.Constants;
+import net.evenh.versionmonitor.infrastructure.config.Constants;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;

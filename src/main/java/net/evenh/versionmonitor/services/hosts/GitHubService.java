@@ -5,7 +5,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
 
 import net.evenh.versionmonitor.HostRegistry;
-import net.evenh.versionmonitor.config.VersionmonitorConfiguration;
+import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
 import net.evenh.versionmonitor.domain.Release;
 import net.evenh.versionmonitor.domain.projects.AbstractProject;
 import net.evenh.versionmonitor.domain.projects.GitHubProject;
