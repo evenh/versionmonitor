@@ -1,17 +1,17 @@
-package net.evenh.versionmonitor.services.hosts;
+package net.evenh.versionmonitor.application.hosts.impl;
 
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
 
-import net.evenh.versionmonitor.HostRegistry;
+import net.evenh.versionmonitor.application.hosts.HostRegistry;
 import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
 import net.evenh.versionmonitor.domain.Release;
-import net.evenh.versionmonitor.domain.projects.AbstractProject;
+import net.evenh.versionmonitor.application.projects.AbstractProject;
 import net.evenh.versionmonitor.domain.projects.GitHubProject;
-import net.evenh.versionmonitor.repositories.ProjectRepository;
-import net.evenh.versionmonitor.repositories.ReleaseRepository;
-import net.evenh.versionmonitor.services.HostService;
+import net.evenh.versionmonitor.application.projects.ProjectRepository;
+import net.evenh.versionmonitor.application.releases.ReleaseRepository;
+import net.evenh.versionmonitor.application.hosts.HostService;
 
 import org.kohsuke.github.GHRateLimit;
 import org.kohsuke.github.GHRepository;
@@ -128,7 +128,7 @@ public class GitHubService extends AbstractHealthIndicator implements HostServic
    */
   public Optional<GHRepository> getRepository(final String ownerRepo) throws IllegalArgumentException,
     FileNotFoundException {
-    logger.debug("Repository identifier: {}", ownerRepo);
+    logger.debug("Processing repository with identifier: {}", ownerRepo);
 
     if (ownerRepo == null || ownerRepo.isEmpty()) {
       throw new IllegalArgumentException("GitHub repository identifier is missing");

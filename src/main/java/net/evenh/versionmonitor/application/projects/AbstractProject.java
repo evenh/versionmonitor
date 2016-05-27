@@ -1,6 +1,10 @@
-package net.evenh.versionmonitor.domain.projects;
+package net.evenh.versionmonitor.application.projects;
 
+import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
 import net.evenh.versionmonitor.domain.Release;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +19,7 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
@@ -27,6 +32,8 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class AbstractProject implements Project {
+  private static final Logger log = LoggerFactory.getLogger(AbstractProject.class);
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -43,6 +50,10 @@ public abstract class AbstractProject implements Project {
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   @JoinColumn(name = "project_id")
   private List<Release> releases;
+
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @JoinTable(name = "project_subscriptions")
+  private List<AbstractSubscription> subscriptions;
 
   public AbstractProject(){
   }
@@ -98,6 +109,24 @@ public abstract class AbstractProject implements Project {
   @Override
   public void addRelease(Release release) {
     releases.add(release);
+  }
+
+  public void setSubscriptions(List<AbstractSubscription> subscriptions) {
+    this.subscriptions = subscriptions;
+  }
+
+  @Override
+  public void addSubscription(AbstractSubscription subscription) {
+   if (subscriptions.contains(subscription)) {
+     log.info("Subscription does already exist - won't add: {}", subscription);
+   } else {
+     subscriptions.add(subscription);
+   }
+  }
+
+  @Override
+  public List<AbstractSubscription> getSubscriptions() {
+    return subscriptions;
   }
 
   @Override

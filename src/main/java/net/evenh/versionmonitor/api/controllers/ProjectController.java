@@ -1,12 +1,14 @@
-package net.evenh.versionmonitor.controllers;
+package net.evenh.versionmonitor.api.controllers;
 
-import net.evenh.versionmonitor.HostRegistry;
-import net.evenh.versionmonitor.commands.AddProjectCommand;
-import net.evenh.versionmonitor.composites.ErrorMessageComposite;
-import net.evenh.versionmonitor.domain.ErrorCode;
-import net.evenh.versionmonitor.domain.projects.AbstractProject;
-import net.evenh.versionmonitor.repositories.ProjectRepository;
-import net.evenh.versionmonitor.services.HostService;
+import com.google.common.collect.ImmutableMap;
+
+import net.evenh.versionmonitor.api.commands.AddProjectCommand;
+import net.evenh.versionmonitor.application.hosts.HostRegistry;
+import net.evenh.versionmonitor.application.hosts.HostService;
+import net.evenh.versionmonitor.application.projects.ProjectRepository;
+import net.evenh.versionmonitor.application.projects.AbstractProject;
+import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
+import net.evenh.versionmonitor.application.subscriptions.SubscriptionRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,12 +40,12 @@ public class ProjectController {
   private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
   @Autowired
-  private ProjectRepository repository;
+  ProjectRepository repository;
 
   @Autowired
-  HostRegistry registry;
+  SubscriptionRepository subscriptionRepository;
 
-  private ErrorCode error;
+  @Autowired HostRegistry registry;
 
   /**
    * Get all existing projects.
@@ -54,8 +57,7 @@ public class ProjectController {
     List<AbstractProject> projects = repository.findAll();
 
     if (projects.isEmpty()) {
-      ErrorCode error = ErrorCode.NO_PROJECTS;
-      return new ResponseEntity<>(ErrorMessageComposite.of(error), error.getHttpStatus());
+      return responseMessage("No projects exists", HttpStatus.NOT_FOUND);
     }
 
     return ResponseEntity.ok(projects);
@@ -82,7 +84,7 @@ public class ProjectController {
         // Check for duplicates
         if (repository.findByIdentifier(command.getIdentifier()).isPresent()) {
           logger.info("Project '{}' does already exist in the database", command.getIdentifier());
-          return errorOf(ErrorCode.DUPLICATE_PROJECT);
+          return responseMessage("This project already exists", HttpStatus.CONFLICT);
         }
 
         HostService service = registry.getHostService(hostname).get();
@@ -97,7 +99,7 @@ public class ProjectController {
       }
     }
 
-    return errorOf(ErrorCode.UNKNOWN_PROJECT_TYPE);
+    return responseMessage("Unknown project type", HttpStatus.UNPROCESSABLE_ENTITY);
   }
 
   /**
@@ -111,10 +113,31 @@ public class ProjectController {
     AbstractProject project = repository.findOne(id);
 
     if (project == null) {
-      return errorOf(ErrorCode.PROJECT_NOT_FOUND);
+      return responseMessage("Project not found", HttpStatus.NOT_FOUND);
     }
 
     return ResponseEntity.ok(project);
+  }
+
+  @RequestMapping(value = "/{id}/subscribe/{subscriptionId}", method = RequestMethod.POST)
+  public ResponseEntity addSubscriber(@PathVariable Long id, @PathVariable Long subscriptionId) {
+    AbstractSubscription subscription = subscriptionRepository.findOne(subscriptionId);
+    AbstractProject project = repository.findOne(id);
+
+    if (project == null) {
+      return responseMessage("Project not found", HttpStatus.NOT_FOUND);
+    }
+
+    if (subscription == null) {
+      return responseMessage("Subscription not found", HttpStatus.NOT_FOUND);
+    }
+
+    project.addSubscription(subscription);
+    AbstractProject savedProject = repository.save(project);
+
+    logger.info("Successfully added subscription for project {}: {}", savedProject.getName(), subscription);
+
+    return ResponseEntity.ok(savedProject);
   }
 
   /**
@@ -128,7 +151,7 @@ public class ProjectController {
     AbstractProject project = repository.findOne(id);
 
     if (project == null) {
-      return errorOf(ErrorCode.PROJECT_NOT_FOUND);
+      return responseMessage("Project not found", HttpStatus.NOT_FOUND);
     }
 
     repository.delete(project);
@@ -136,13 +159,7 @@ public class ProjectController {
     return ResponseEntity.noContent().build();
   }
 
-  /**
-   * Creates a <code>ResponseEntity</code> for a given <code>ErrorCode</code>.
-   *
-   * @param error A <code>ErrorCode</code>.
-   * @return A populated <code>ResponseEntity</code> containing an <code>ErrorMessageComposite</code>.
-   */
-  private ResponseEntity errorOf(ErrorCode error) {
-    return new ResponseEntity<>(ErrorMessageComposite.of(error), error.getHttpStatus());
+  private ResponseEntity responseMessage(String message, HttpStatus status) {
+    return new ResponseEntity(ImmutableMap.of("timestamp", new Date(), "message", message), status);
   }
 }

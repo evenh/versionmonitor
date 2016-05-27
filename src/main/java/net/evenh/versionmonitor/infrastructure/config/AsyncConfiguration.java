@@ -1,6 +1,6 @@
 package net.evenh.versionmonitor.infrastructure.config;
 
-import net.evenh.versionmonitor.async.ExceptionHandlingAsyncTaskExecutor;
+import net.evenh.versionmonitor.infrastructure.config.async.ExceptionHandlingAsyncTaskExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

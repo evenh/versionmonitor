@@ -1,6 +1,4 @@
-package net.evenh.versionmonitor.commands;
-
-import java.io.Serializable;
+package net.evenh.versionmonitor.api.commands;
 
 import javax.validation.constraints.NotNull;
 
@@ -10,9 +8,10 @@ import javax.validation.constraints.NotNull;
  * @author Even Holthe
  * @since 2016-01-10
  */
-public class AddProjectCommand implements Serializable {
+public class AddProjectCommand {
   @NotNull
   private String host;
+
   @NotNull
   private String identifier;
 

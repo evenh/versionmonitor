@@ -1,4 +1,4 @@
-package net.evenh.versionmonitor.repositories;
+package net.evenh.versionmonitor.application.releases;
 
 import net.evenh.versionmonitor.domain.Release;
 

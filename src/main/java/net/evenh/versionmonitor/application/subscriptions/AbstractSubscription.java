@@ -1,23 +1,36 @@
-package net.evenh.versionmonitor.domain;
+package net.evenh.versionmonitor.application.subscriptions;
+
+import net.evenh.versionmonitor.api.commands.AddSubscriptionCommand;
+
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.validation.constraints.NotNull;
 
-/**
- * A subscription of new release notifications.
- *
- * @author Even Holthe
- * @since 2016-02-03
- */
 @Entity(name = "subscriptions")
-public class Subscription {
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class AbstractSubscription implements Subscription {
+  public AbstractSubscription() {
+  }
+
+  public AbstractSubscription(AddSubscriptionCommand command) {
+  }
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
+  @NotNull
+  @NotEmpty
   private String name;
+
+  @NotNull
+  @NotEmpty
   private String identifier;
 
   public Long getId() {
@@ -42,14 +55,5 @@ public class Subscription {
 
   public void setIdentifier(String identifier) {
     this.identifier = identifier;
-  }
-
-  @Override
-  public String toString() {
-    return "Subscription{"
-            + "id='" + id + '\''
-            + "name='" + name + '\''
-            + ", identifier='" + identifier + '\''
-            + '}';
   }
 }

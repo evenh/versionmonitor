@@ -1,11 +1,12 @@
-package net.evenh.versionmonitor.jobs;
+package net.evenh.versionmonitor.application.jobs;
 
-import net.evenh.versionmonitor.HostRegistry;
+import net.evenh.versionmonitor.application.hosts.HostRegistry;
 import net.evenh.versionmonitor.domain.Release;
-import net.evenh.versionmonitor.domain.Subscription;
+import net.evenh.versionmonitor.domain.subscriptions.SlackSubscription;
 import net.evenh.versionmonitor.domain.notifications.SlackNotification;
-import net.evenh.versionmonitor.domain.projects.AbstractProject;
-import net.evenh.versionmonitor.repositories.ProjectRepository;
+import net.evenh.versionmonitor.application.projects.AbstractProject;
+import net.evenh.versionmonitor.application.projects.ProjectRepository;
+import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,9 @@ public class ReleaseChecker {
   @Autowired
   private SlackNotification slack;
 
+  @Autowired
+  private VersionmonitorConfiguration config;
+
   /**
    * Performs the actual checking for new releases at a scheduled interval.
    */
@@ -60,10 +64,10 @@ public class ReleaseChecker {
     logger.info("Found a total of {} new releases", releases.size());
 
     // TODO: Not have static hook
-    Subscription s = new Subscription();
+    SlackSubscription s = new SlackSubscription();
     s.setId(1L);
-    s.setIdentifier("https://hooks.slack.com/services/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");
-    s.setName("Koderiet-org");
+    s.setIdentifier(config.getSlack().getWebhookUrl());
+    s.setName("PxSlack");
 
     releases.forEach(release -> slack.sendNotification(release, s));
   }

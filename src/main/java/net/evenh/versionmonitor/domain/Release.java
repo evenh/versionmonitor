@@ -36,15 +36,8 @@ public class Release {
   @NotNull
   private String url;
 
-  @Column(nullable = true)
-  private Boolean prerelease;
-
   @Column(nullable = false)
-  private Date createdAt;
-
-  private Release() {
-    this.prerelease = null;
-  }
+  private Date releasedAt;
 
   public Long getId() {
     return id;
@@ -66,16 +59,8 @@ public class Release {
     this.url = url;
   }
 
-  public Boolean isPrerelease() {
-    return prerelease;
-  }
-
-  private void setPrerelease(Boolean prerelease) {
-    this.prerelease = prerelease;
-  }
-
-  public void setCreatedAt(Date createdAt) {
-    this.createdAt = createdAt;
+  public void setReleasedAt(Date releasedAt) {
+    this.releasedAt = releasedAt;
   }
 
   /**
@@ -83,9 +68,9 @@ public class Release {
    *
    * @return The insertion date in the database as a ISO 8601 string.
    */
-  public String getCreatedAt() {
+  public String getReleasedAt() {
     return ZonedDateTime
-            .ofInstant(createdAt.toInstant(), ZoneId.systemDefault())
+            .ofInstant(releasedAt.toInstant(), ZoneId.systemDefault())
             .format(DateTimeFormatter.ISO_INSTANT);
   }
 
@@ -93,9 +78,8 @@ public class Release {
   public String toString() {
     return "Release{" + "id='" + id + '\''
             + ", version='" + version + '\''
-            + ", prerelease='" + prerelease + '\''
             + ", url='" + url + '\''
-            + ", createdAt='" + getCreatedAt() + '\''
+            + ", releasedAt='" + getReleasedAt() + '\''
             + '}';
   }
 
@@ -181,8 +165,7 @@ public class Release {
       Release release = new Release();
       release.setVersion(version);
       release.setUrl(url);
-      release.setPrerelease(prerelease);
-      release.setCreatedAt(createdAt);
+      release.setReleasedAt(createdAt);
 
       return release;
     }

@@ -1,6 +1,6 @@
 package net.evenh.versionmonitor.infrastructure.config;
 
-import net.evenh.versionmonitor.aop.logging.LoggingAspect;
+import net.evenh.versionmonitor.infrastructure.config.logging.LoggingAspect;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

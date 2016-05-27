@@ -1,4 +1,4 @@
-package net.evenh.versionmonitor.aop.logging;
+package net.evenh.versionmonitor.infrastructure.config.logging;
 
 import net.evenh.versionmonitor.infrastructure.config.Constants;
 

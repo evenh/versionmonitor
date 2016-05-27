@@ -1,7 +1,7 @@
 package net.evenh.versionmonitor.domain.projects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.evenh.versionmonitor.application.projects.AbstractProject;
+import net.evenh.versionmonitor.application.projects.Project;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -15,8 +15,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "projects_github")
 public class GitHubProject extends AbstractProject implements Project {
-  private static final Logger logger = LoggerFactory.getLogger(GitHubProject.class);
-
   public GitHubProject() {
   }
 

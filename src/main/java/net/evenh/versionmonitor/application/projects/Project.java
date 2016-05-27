@@ -1,5 +1,6 @@
-package net.evenh.versionmonitor.domain.projects;
+package net.evenh.versionmonitor.application.projects;
 
+import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
 import net.evenh.versionmonitor.domain.Release;
 
 import java.util.List;
@@ -42,6 +43,16 @@ public interface Project {
    * @param release A <code>Release</code> object.
    */
   void addRelease(Release release);
+
+  /**
+   * Returns a list of notification subscribers for this project.
+   */
+  List<AbstractSubscription> getSubscriptions();
+
+  /**
+   * Adds a notification subscriber to this project.
+   */
+  void addSubscription(AbstractSubscription subscription);
 
   /**
    * Returns the URL of this project on a given host.

@@ -1,7 +1,8 @@
-package net.evenh.versionmonitor;
+package net.evenh.versionmonitor.application.hosts.impl;
 
-import net.evenh.versionmonitor.domain.projects.AbstractProject;
-import net.evenh.versionmonitor.services.HostService;
+import net.evenh.versionmonitor.application.hosts.HostRegistry;
+import net.evenh.versionmonitor.application.hosts.HostService;
+import net.evenh.versionmonitor.application.projects.AbstractProject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,18 +13,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * A registry of available hosts.
- *
- * @author Even Holthe
- * @since 2016-03-07
- */
 @Component
-public class HostRegistry {
+public class DefaultHostRegistry implements HostRegistry {
   private static final Logger logger = LoggerFactory.getLogger(HostRegistry.class);
   private final Map<String, HostService> registry = new HashMap<>();
 
-  private HostRegistry() {
+  private DefaultHostRegistry() {
   }
 
   /**

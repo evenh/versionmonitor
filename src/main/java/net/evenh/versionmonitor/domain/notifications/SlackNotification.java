@@ -1,10 +1,11 @@
 package net.evenh.versionmonitor.domain.notifications;
 
-import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
+import net.evenh.versionmonitor.application.notifications.Notification;
+import net.evenh.versionmonitor.application.projects.AbstractProject;
+import net.evenh.versionmonitor.application.projects.ProjectRepository;
+import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
 import net.evenh.versionmonitor.domain.Release;
-import net.evenh.versionmonitor.domain.Subscription;
-import net.evenh.versionmonitor.domain.projects.AbstractProject;
-import net.evenh.versionmonitor.repositories.ProjectRepository;
+import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
 import net.gpedro.integrations.slack.SlackApi;
 import net.gpedro.integrations.slack.SlackMessage;
 
@@ -40,7 +41,7 @@ public class SlackNotification implements Notification, InitializingBean {
   }
 
   @Override
-  public boolean sendNotification(Release release, Subscription subscription) {
+  public boolean sendNotification(Release release, AbstractSubscription subscription) {
     try {
       SlackApi api = new SlackApi(subscription.getIdentifier());
 
