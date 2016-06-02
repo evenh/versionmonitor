@@ -5,6 +5,7 @@ import net.evenh.versionmonitor.application.projects.AbstractProject;
 import net.evenh.versionmonitor.application.projects.ProjectRepository;
 import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
 import net.evenh.versionmonitor.domain.Release;
+import net.evenh.versionmonitor.domain.subscriptions.SlackSubscription;
 import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
 import net.gpedro.integrations.slack.SlackApi;
 import net.gpedro.integrations.slack.SlackMessage;
@@ -42,20 +43,24 @@ public class SlackNotification implements Notification, InitializingBean {
 
   @Override
   public boolean sendNotification(Release release, AbstractSubscription subscription) {
+    if(!(subscription instanceof SlackSubscription)) {
+      throw new IllegalStateException("Expected an instance of SlackSubscription");
+    }
+
+    final SlackSubscription slackSubscription = (SlackSubscription) subscription;
+
     try {
-      SlackApi api = new SlackApi(subscription.getIdentifier());
+      SlackApi api = new SlackApi(slackSubscription.getIdentifier());
 
-      Optional<SlackMessage> message = constructMessage(release);
+      constructMessage(release)
+        .ifPresent(message -> {
+          message.setChannel(slackSubscription.getChannel());
+          api.call(message);
 
-      if (message.isPresent()) {
-        api.call(message.get());
-        logger.debug("Successfully notified: {} of a new release. {}", subscription, release);
-      } else {
-        logger.warn("Could not construct SlackMessage for release: {}", release);
-      }
-
+          logger.debug("Successfully notified: {} of a new release. {}", subscription, release);
+        });
     } catch (RuntimeException e) {
-      logger.warn("Could not Slack notification for release: " + release, e);
+      logger.warn("Could not create Slack notification for release: {}", release, e);
 
       return false;
     }
@@ -90,6 +95,8 @@ public class SlackNotification implements Notification, InitializingBean {
 
       return Optional.of(msg);
     }
+
+    logger.warn("Could not construct SlackMessage for release: {}", release);
 
     return Optional.empty();
   }

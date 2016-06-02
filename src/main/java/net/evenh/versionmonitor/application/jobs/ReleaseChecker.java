@@ -67,6 +67,7 @@ public class ReleaseChecker {
     SlackSubscription s = new SlackSubscription();
     s.setId(1L);
     s.setIdentifier(config.getSlack().getWebhookUrl());
+    s.setChannel("#mychannel");
     s.setName("PxSlack");
 
     releases.forEach(release -> slack.sendNotification(release, s));
