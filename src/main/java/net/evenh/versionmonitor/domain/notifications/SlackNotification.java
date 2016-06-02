@@ -54,7 +54,10 @@ public class SlackNotification implements Notification, InitializingBean {
 
       constructMessage(release)
         .ifPresent(message -> {
-          message.setChannel(slackSubscription.getChannel());
+          if(slackSubscription.getChannel() != null) {
+            message.setChannel(slackSubscription.getChannel());
+          }
+
           api.call(message);
 
           logger.debug("Successfully notified: {} of a new release. {}", subscription, release);

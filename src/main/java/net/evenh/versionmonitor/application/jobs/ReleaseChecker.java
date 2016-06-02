@@ -1,11 +1,11 @@
 package net.evenh.versionmonitor.application.jobs;
 
 import net.evenh.versionmonitor.application.hosts.HostRegistry;
-import net.evenh.versionmonitor.domain.Release;
-import net.evenh.versionmonitor.domain.subscriptions.SlackSubscription;
-import net.evenh.versionmonitor.domain.notifications.SlackNotification;
 import net.evenh.versionmonitor.application.projects.AbstractProject;
+import net.evenh.versionmonitor.application.projects.Project;
 import net.evenh.versionmonitor.application.projects.ProjectRepository;
+import net.evenh.versionmonitor.domain.Release;
+import net.evenh.versionmonitor.domain.notifications.SlackNotification;
 import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
 
 import org.slf4j.Logger;
@@ -14,8 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Schedules and delegates the checking for new releases.
@@ -51,11 +52,11 @@ public class ReleaseChecker {
       return;
     }
 
-    final List<Release> releases = new ArrayList<>();
+    final Map<Project, Release> releases = new HashMap<>();
 
     projects.forEach(project -> registry.forProject(project).ifPresent(host -> {
       try {
-        host.check(project).stream().forEach(releases::add);
+        host.check(project).stream().forEach(release -> releases.put(project, release));
       } catch (Exception e) {
         logger.warn("Got exception while checking for updates for {}", project, e);
       }
@@ -63,13 +64,10 @@ public class ReleaseChecker {
 
     logger.info("Found a total of {} new releases", releases.size());
 
-    // TODO: Not have static hook
-    SlackSubscription s = new SlackSubscription();
-    s.setId(1L);
-    s.setIdentifier(config.getSlack().getWebhookUrl());
-    s.setChannel("#mychannel");
-    s.setName("PxSlack");
-
-    releases.forEach(release -> slack.sendNotification(release, s));
+    releases.forEach((project, release) -> {
+      project.getSubscriptions().forEach(subscription -> {
+        slack.sendNotification(release, subscription);
+      });
+    });
   }
 }
