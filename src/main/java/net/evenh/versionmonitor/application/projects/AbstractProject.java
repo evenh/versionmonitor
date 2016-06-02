@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -19,7 +20,7 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
@@ -51,9 +52,8 @@ public abstract class AbstractProject implements Project {
   @JoinColumn(name = "project_id")
   private List<Release> releases;
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-  @JoinTable(name = "project_subscriptions")
-  private List<AbstractSubscription> subscriptions;
+  @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  private Set<AbstractSubscription> subscriptions;
 
   public AbstractProject(){
   }
@@ -111,7 +111,7 @@ public abstract class AbstractProject implements Project {
     releases.add(release);
   }
 
-  public void setSubscriptions(List<AbstractSubscription> subscriptions) {
+  public void setSubscriptions(Set<AbstractSubscription> subscriptions) {
     this.subscriptions = subscriptions;
   }
 
@@ -125,7 +125,7 @@ public abstract class AbstractProject implements Project {
   }
 
   @Override
-  public List<AbstractSubscription> getSubscriptions() {
+  public Set<AbstractSubscription> getSubscriptions() {
     return subscriptions;
   }
 

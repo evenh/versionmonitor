@@ -4,6 +4,7 @@ import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
 import net.evenh.versionmonitor.domain.Release;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * The software project interface specifies how to interact with a specific host where a software
@@ -47,7 +48,7 @@ public interface Project {
   /**
    * Returns a list of notification subscribers for this project.
    */
-  List<AbstractSubscription> getSubscriptions();
+  Set<AbstractSubscription> getSubscriptions();
 
   /**
    * Adds a notification subscriber to this project.
