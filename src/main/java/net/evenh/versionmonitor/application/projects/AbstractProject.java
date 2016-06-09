@@ -52,7 +52,7 @@ public abstract class AbstractProject implements Project {
   @JoinColumn(name = "project_id")
   private List<Release> releases;
 
-  @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH}, fetch = FetchType.EAGER)
   private Set<AbstractSubscription> subscriptions;
 
   public AbstractProject() {
