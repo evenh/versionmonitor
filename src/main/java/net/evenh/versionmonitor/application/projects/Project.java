@@ -53,7 +53,12 @@ public interface Project {
   /**
    * Adds a notification subscriber to this project.
    */
-  void addSubscription(AbstractSubscription subscription);
+  boolean addSubscription(AbstractSubscription subscription);
+
+  /**
+   * Removes a notification subscriber from this project.
+   */
+  boolean removeSubscription(AbstractSubscription subscription);
 
   /**
    * Returns the URL of this project on a given host.

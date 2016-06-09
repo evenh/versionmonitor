@@ -43,16 +43,21 @@ public class SlackSubscription extends AbstractSubscription {
     if (o == null || getClass() != o.getClass()) return false;
     SlackSubscription that = (SlackSubscription) o;
 
-    return (this.getIdentifier().equals(that.getIdentifier()) && this.getChannel().equalsIgnoreCase(that.getChannel()));
+    return this.getIdentifier().equalsIgnoreCase(that.getIdentifier()) && this.getName().equalsIgnoreCase(that.getName());
   }
 
   @Override
   public String toString() {
     return "SlackSubscription{" +
       "name='" + getName() + '\'' +
-      "identifier='" + getIdentifier() + '\'' +
-      "channel='" + channel + '\'' +
+      " identifier='" + getIdentifier() + '\'' +
+      " channel='" + channel + '\'' +
       '}';
+  }
+
+  @Override
+  public int hashCode() {
+    return getIdentifier().hashCode() + (channel != null ? channel.hashCode() : 0);
   }
 
   @Override

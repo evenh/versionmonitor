@@ -27,8 +27,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import fr.ippon.spark.metrics.SparkReporter;
-
 @Configuration
 @EnableMetrics(proxyTargetClass = true)
 public class MetricsConfiguration extends MetricsConfigurerAdapter {
@@ -110,33 +108,6 @@ public class MetricsConfiguration extends MetricsConfigurerAdapter {
           .prefixedWith(graphitePrefix)
           .build(graphite);
         graphiteReporter.start(1, TimeUnit.MINUTES);
-      }
-    }
-  }
-
-  @Configuration
-  @ConditionalOnClass(SparkReporter.class)
-  public static class SparkRegistry {
-
-    private final Logger log = LoggerFactory.getLogger(SparkRegistry.class);
-
-    @Autowired
-    private MetricRegistry metricRegistry;
-
-    @Autowired
-    private VersionmonitorConfiguration props;
-
-    @PostConstruct
-    private void init() {
-      if (props.getMetrics().getSpark().isEnabled()) {
-        log.info("Initializing Metrics Spark reporting");
-        String sparkHost = props.getMetrics().getSpark().getHost();
-        Integer sparkPort = props.getMetrics().getSpark().getPort();
-        SparkReporter sparkReporter = SparkReporter.forRegistry(metricRegistry)
-          .convertRatesTo(TimeUnit.SECONDS)
-          .convertDurationsTo(TimeUnit.MILLISECONDS)
-          .build(sparkHost, sparkPort);
-        sparkReporter.start(1, TimeUnit.MINUTES);
       }
     }
   }

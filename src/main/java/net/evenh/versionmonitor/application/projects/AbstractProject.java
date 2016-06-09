@@ -55,7 +55,7 @@ public abstract class AbstractProject implements Project {
   @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private Set<AbstractSubscription> subscriptions;
 
-  public AbstractProject(){
+  public AbstractProject() {
   }
 
   public AbstractProject(String identifier) {
@@ -116,12 +116,27 @@ public abstract class AbstractProject implements Project {
   }
 
   @Override
-  public void addSubscription(AbstractSubscription subscription) {
-   if (subscriptions.contains(subscription)) {
-     log.info("Subscription does already exist - won't add: {}", subscription);
-   } else {
-     subscriptions.add(subscription);
-   }
+  public boolean addSubscription(AbstractSubscription subscription) {
+    if (subscriptions.contains(subscription)) {
+      log.info("Subscription does already exist - won't add: {}", subscription);
+      return false;
+    } else {
+      subscriptions.add(subscription);
+    }
+
+    return true;
+  }
+
+  @Override
+  public boolean removeSubscription(AbstractSubscription subscription) {
+    if (!subscriptions.contains(subscription)) {
+      log.info("Subscription does not exist - won't remove: {}", subscription);
+      return false;
+    } else {
+      subscriptions.remove(subscription);
+    }
+
+    return true;
   }
 
   @Override
@@ -132,9 +147,9 @@ public abstract class AbstractProject implements Project {
   @Override
   public String toString() {
     return this.getClass().getSimpleName() + "{" + "id='" + id + '\''
-            + ", name='" + name + '\''
-            + ", description='" + description + '\''
-            + ", identifier='" + identifier + '\''
-            + '}';
+      + ", name='" + name + '\''
+      + ", description='" + description + '\''
+      + ", identifier='" + identifier + '\''
+      + '}';
   }
 }

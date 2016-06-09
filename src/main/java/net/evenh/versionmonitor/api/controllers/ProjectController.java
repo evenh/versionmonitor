@@ -45,7 +45,8 @@ public class ProjectController {
   @Autowired
   SubscriptionRepository subscriptionRepository;
 
-  @Autowired HostRegistry registry;
+  @Autowired
+  HostRegistry registry;
 
   /**
    * Get all existing projects.
@@ -119,6 +120,11 @@ public class ProjectController {
     return ResponseEntity.ok(project);
   }
 
+  /**
+   * Links a <code>AbstractSubscription</code> to a given projet.
+   * @param id The id of the project.
+   * @param subscriptionId The subscription id to link.
+   */
   @RequestMapping(value = "/{id}/subscribe/{subscriptionId}", method = RequestMethod.POST)
   public ResponseEntity addSubscriber(@PathVariable Long id, @PathVariable Long subscriptionId) {
     AbstractSubscription subscription = subscriptionRepository.findOne(subscriptionId);
@@ -132,10 +138,48 @@ public class ProjectController {
       return responseMessage("Subscription not found", HttpStatus.NOT_FOUND);
     }
 
-    project.addSubscription(subscription);
+    boolean added = project.addSubscription(subscription);
+
+    if (!added) {
+      return responseMessage("This subscription is already linked to project " + id, HttpStatus.CONFLICT);
+    }
+
     AbstractProject savedProject = repository.save(project);
 
-    logger.info("Successfully added subscription for project {}: {}", savedProject.getName(), subscription);
+    logger.info("Successfully added subscription for project {}: {}", savedProject, subscription);
+
+    return ResponseEntity.ok(savedProject);
+  }
+
+  /**
+   * Unlinks a <code>AbstractSubscription</code> from a given projet.
+   * @param id The id of the project.
+   * @param subscriptionId The subscription id to unlink.
+   */
+  @RequestMapping(value = "/{id}/unsubscribe/{subscriptionId}", method = RequestMethod.POST)
+  public ResponseEntity removeSubscriber(@PathVariable Long id, @PathVariable Long subscriptionId) {
+    AbstractSubscription subscription = subscriptionRepository.findOne(subscriptionId);
+    AbstractProject project = repository.findOne(id);
+
+    if (project == null) {
+      return responseMessage("Project not found", HttpStatus.NOT_FOUND);
+    }
+
+    if (subscription == null) {
+      return responseMessage("Subscription not found", HttpStatus.NOT_FOUND);
+    }
+
+    boolean removed = project.removeSubscription(subscription);
+
+    if (!removed) {
+      return responseMessage("The subscription does not exist for the project with " + id, HttpStatus.NOT_FOUND);
+    }
+
+
+
+    AbstractProject savedProject = repository.save(project);
+
+    logger.info("Successfully removed subscription for project {}: {}", savedProject, subscription);
 
     return ResponseEntity.ok(savedProject);
   }
