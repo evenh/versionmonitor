@@ -2,7 +2,7 @@ package net.evenh.versionmonitor.domain.notifications;
 
 import net.evenh.versionmonitor.application.notifications.Notification;
 import net.evenh.versionmonitor.application.projects.AbstractProject;
-import net.evenh.versionmonitor.application.projects.ProjectRepository;
+import net.evenh.versionmonitor.application.projects.ProjectService;
 import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
 import net.evenh.versionmonitor.domain.releases.Release;
 import net.evenh.versionmonitor.domain.subscriptions.SlackSubscription;
@@ -32,7 +32,7 @@ public class SlackNotification implements Notification, InitializingBean {
   private VersionmonitorConfiguration props;
 
   @Autowired
-  private ProjectRepository projects;
+  private ProjectService service;
 
   private String botname;
 
@@ -79,7 +79,7 @@ public class SlackNotification implements Notification, InitializingBean {
    * @return A properly constructed <code>SlackMessage</code> object.
    */
   private Optional<SlackMessage> constructMessage(Release release) {
-    Optional<AbstractProject> projectMaybe = projects.findByRelease(release);
+    Optional<AbstractProject> projectMaybe = service.findByRelease(release);
 
     if (projectMaybe.isPresent()) {
       AbstractProject project = projectMaybe.get();

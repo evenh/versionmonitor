@@ -5,13 +5,13 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
 
 import net.evenh.versionmonitor.application.hosts.HostRegistry;
-import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
-import net.evenh.versionmonitor.domain.releases.Release;
-import net.evenh.versionmonitor.application.projects.AbstractProject;
-import net.evenh.versionmonitor.domain.projects.GitHubProject;
-import net.evenh.versionmonitor.application.projects.ProjectRepository;
-import net.evenh.versionmonitor.application.releases.ReleaseRepository;
 import net.evenh.versionmonitor.application.hosts.HostService;
+import net.evenh.versionmonitor.application.projects.AbstractProject;
+import net.evenh.versionmonitor.application.projects.ProjectService;
+import net.evenh.versionmonitor.application.releases.ReleaseRepository;
+import net.evenh.versionmonitor.domain.projects.GitHubProject;
+import net.evenh.versionmonitor.domain.releases.Release;
+import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
 
 import org.kohsuke.github.GHRateLimit;
 import org.kohsuke.github.GHRepository;
@@ -53,7 +53,7 @@ public class GitHubService extends AbstractHealthIndicator implements HostServic
   private HostRegistry registry;
 
   @Autowired
-  private ProjectRepository repository;
+  private ProjectService projectService;
 
   @Autowired
   private ReleaseRepository releases;
@@ -248,7 +248,7 @@ public class GitHubService extends AbstractHealthIndicator implements HostServic
             });
 
             newReleases.forEach(project::addRelease);
-            repository.save(project);
+            projectService.persist(project);
           } catch (IOException e) {
             logger.warn(prefix + "Got exception while fetching tags", e);
           }

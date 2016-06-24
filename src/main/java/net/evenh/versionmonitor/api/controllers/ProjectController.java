@@ -8,7 +8,7 @@ import net.evenh.versionmonitor.api.commands.AddProjectCommand;
 import net.evenh.versionmonitor.application.hosts.HostRegistry;
 import net.evenh.versionmonitor.application.hosts.HostService;
 import net.evenh.versionmonitor.application.projects.AbstractProject;
-import net.evenh.versionmonitor.application.projects.ProjectRepository;
+import net.evenh.versionmonitor.application.projects.ProjectService;
 import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
 import net.evenh.versionmonitor.application.subscriptions.SubscriptionRepository;
 import net.evenh.versionmonitor.domain.View;
@@ -43,7 +43,7 @@ public class ProjectController {
   private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
   @Autowired
-  ProjectRepository repository;
+  private ProjectService service;
 
   @Autowired
   SubscriptionRepository subscriptionRepository;
@@ -59,7 +59,7 @@ public class ProjectController {
   @JsonView(View.Summary.class)
   @RequestMapping(method = RequestMethod.GET)
   public ResponseEntity getAllProjects() {
-    List<AbstractProject> projects = repository.findAll();
+    List<AbstractProject> projects = service.findAll();
 
     if (projects.isEmpty()) {
       return responseMessage("No projects exists", HttpStatus.NOT_FOUND);
@@ -87,16 +87,16 @@ public class ProjectController {
       if (hostname.equalsIgnoreCase(command.getHost())) {
 
         // Check for duplicates
-        if (repository.findByIdentifier(command.getIdentifier()).isPresent()) {
+        if (service.doesExist(command.getIdentifier())) {
           logger.info("Project '{}' does already exist in the database", command.getIdentifier());
           return responseMessage("This project already exists", HttpStatus.CONFLICT);
         }
 
-        HostService service = registry.getHostService(hostname).get();
-        Optional<? extends AbstractProject> project = service.getProject(command.getIdentifier());
+        HostService hostService = registry.getHostService(hostname).get();
+        Optional<? extends AbstractProject> project = hostService.getProject(command.getIdentifier());
 
         if (project.isPresent()) {
-          AbstractProject saved = repository.saveAndFlush(project.get());
+          AbstractProject saved = service.persist(project.get());
           logger.info("Successfully added project: {}", saved);
           return new ResponseEntity<>(saved, HttpStatus.CREATED);
         }
@@ -116,9 +116,9 @@ public class ProjectController {
   @JsonView(View.Detail.class)
   @RequestMapping(value = "/{id}", method = RequestMethod.GET)
   public ResponseEntity getOne(@PathVariable Long id) {
-    AbstractProject project = repository.findOne(id);
+    Optional<AbstractProject> project = service.findOne(id);
 
-    if (project == null) {
+    if (!project.isPresent()) {
       return responseMessage("Project not found", HttpStatus.NOT_FOUND);
     }
 
@@ -134,9 +134,9 @@ public class ProjectController {
   @RequestMapping(value = "/{id}/subscribe/{subscriptionId}", method = RequestMethod.POST)
   public ResponseEntity addSubscriber(@PathVariable Long id, @PathVariable Long subscriptionId) {
     AbstractSubscription subscription = subscriptionRepository.findOne(subscriptionId);
-    AbstractProject project = repository.findOne(id);
+    Optional<AbstractProject> projectMaybe = service.findOne(id);
 
-    if (project == null) {
+    if (!projectMaybe.isPresent()) {
       return responseMessage("Project not found", HttpStatus.NOT_FOUND);
     }
 
@@ -144,13 +144,13 @@ public class ProjectController {
       return responseMessage("Subscription not found", HttpStatus.NOT_FOUND);
     }
 
-    boolean added = project.addSubscription(subscription);
+    AbstractProject project = projectMaybe.get();
 
-    if (!added) {
+    if (!project.addSubscription(subscription)) {
       return responseMessage("This subscription is already linked to project " + id, HttpStatus.CONFLICT);
     }
 
-    AbstractProject savedProject = repository.save(project);
+    AbstractProject savedProject = service.persist(project);
 
     logger.info("Successfully added subscription for project {}: {}", savedProject, subscription);
 
@@ -166,9 +166,9 @@ public class ProjectController {
   @RequestMapping(value = "/{id}/unsubscribe/{subscriptionId}", method = RequestMethod.POST)
   public ResponseEntity removeSubscriber(@PathVariable Long id, @PathVariable Long subscriptionId) {
     AbstractSubscription subscription = subscriptionRepository.findOne(subscriptionId);
-    AbstractProject project = repository.findOne(id);
+    Optional<AbstractProject> projectMaybe = service.findOne(id);
 
-    if (project == null) {
+    if (!projectMaybe.isPresent()) {
       return responseMessage("Project not found", HttpStatus.NOT_FOUND);
     }
 
@@ -176,15 +176,16 @@ public class ProjectController {
       return responseMessage("Subscription not found", HttpStatus.NOT_FOUND);
     }
 
-    boolean removed = project.removeSubscription(subscription);
 
-    if (!removed) {
+    AbstractProject project = projectMaybe.get();
+
+    if (!project.removeSubscription(subscription)) {
       return responseMessage("The subscription does not exist for the project with " + id, HttpStatus.NOT_FOUND);
     }
 
 
 
-    AbstractProject savedProject = repository.save(project);
+    AbstractProject savedProject = service.persist(project);
 
     logger.info("Successfully removed subscription for project {}: {}", savedProject, subscription);
 
@@ -199,13 +200,13 @@ public class ProjectController {
    */
   @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
   public ResponseEntity deleteOne(@PathVariable Long id) {
-    AbstractProject project = repository.findOne(id);
+    Optional<AbstractProject> project = service.findOne(id);
 
-    if (project == null) {
+    if (!project.isPresent()) {
       return responseMessage("Project not found", HttpStatus.NOT_FOUND);
     }
 
-    repository.delete(project);
+    service.delete(project.get());
 
     return ResponseEntity.noContent().build();
   }

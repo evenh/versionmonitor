@@ -3,9 +3,9 @@ package net.evenh.versionmonitor.application.jobs;
 import net.evenh.versionmonitor.application.hosts.HostRegistry;
 import net.evenh.versionmonitor.application.projects.AbstractProject;
 import net.evenh.versionmonitor.application.projects.Project;
-import net.evenh.versionmonitor.application.projects.ProjectRepository;
-import net.evenh.versionmonitor.domain.releases.Release;
+import net.evenh.versionmonitor.application.projects.ProjectService;
 import net.evenh.versionmonitor.domain.notifications.SlackNotification;
+import net.evenh.versionmonitor.domain.releases.Release;
 import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
 
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public class ReleaseChecker {
   private static final Logger logger = LoggerFactory.getLogger(ReleaseChecker.class);
 
   @Autowired
-  private ProjectRepository repository;
+  private ProjectService service;
 
   @Autowired
   private HostRegistry registry;
@@ -45,7 +45,7 @@ public class ReleaseChecker {
    */
   @Scheduled(cron = "${versionmonitor.jobchecker.cron}")
   public void check() {
-    List<AbstractProject> projects = repository.findAll();
+    List<AbstractProject> projects = service.findAll();
 
     if (projects.isEmpty()) {
       logger.info("No projects found, skipping checks");
