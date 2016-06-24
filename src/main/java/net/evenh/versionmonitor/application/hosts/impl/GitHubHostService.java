@@ -1,6 +1,5 @@
 package net.evenh.versionmonitor.application.hosts.impl;
 
-import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
 
@@ -26,14 +25,12 @@ import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -45,9 +42,9 @@ import static net.evenh.versionmonitor.domain.releases.Release.ReleaseBuilder;
  * @author Even Holthe
  * @since 2016-01-09
  */
-@Service("gitHubService")
-public class GitHubService extends AbstractHealthIndicator implements HostService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(GitHubService.class);
+@Service("gitHubHostService")
+public class GitHubHostService extends AbstractHealthIndicator implements HostService, InitializingBean {
+  private static final Logger logger = LoggerFactory.getLogger(GitHubHostService.class);
 
   @Autowired
   private HostRegistry registry;
@@ -61,6 +58,9 @@ public class GitHubService extends AbstractHealthIndicator implements HostServic
   @Autowired
   private VersionmonitorConfiguration props;
 
+  @Autowired
+  private OkHttpClient httpClient;
+
   private String authToken;
 
   private Integer rateLimitBuffer;
@@ -69,7 +69,7 @@ public class GitHubService extends AbstractHealthIndicator implements HostServic
 
   private GitHub gitHub;
 
-  private GitHubService() {
+  private GitHubHostService() {
   }
 
   /**
@@ -84,31 +84,25 @@ public class GitHubService extends AbstractHealthIndicator implements HostServic
   public void afterPropertiesSet() throws IllegalArgumentException, IOException {
     this.authToken = props.getGithub().getOauthToken();
     this.rateLimitBuffer = props.getGithub().getRatelimitBuffer();
-    this.cacheSize = props.getGithub().getCachesize();
 
     if (authToken == null || authToken.isEmpty()) {
       throw new IllegalArgumentException("Missing GitHub OAuth2 token");
     }
 
     try {
-      // Set up caching
-      File cacheDir = new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
-      Cache cache = new Cache(cacheDir, cacheSize * 1024 * 1024);
-
       gitHub = GitHubBuilder
         .fromEnvironment()
         .withOAuthToken(authToken)
         .withConnector(new OkHttpConnector(
-          new OkUrlFactory(new OkHttpClient().setCache(cache))
+          new OkUrlFactory(httpClient)
         ))
         .build();
-
     } catch (IOException e) {
       logger.warn("Caught exception while connecting to GitHub", e);
       throw e;
     }
 
-    // Register GitHubService with the host registry
+    // Register GitHubHostService with the host registry
     registry.register(this);
 
     logger.info("GitHub service up and running");
@@ -182,7 +176,7 @@ public class GitHubService extends AbstractHealthIndicator implements HostServic
 
       return Optional.empty();
     } catch (IllegalArgumentException e) {
-      logger.warn("Illegal arguments were supplied to the GitHubService", e);
+      logger.warn("Illegal arguments were supplied to the GitHubHostService", e);
     } catch (FileNotFoundException e) {
       logger.warn("Project not found: {}", identifier);
     } catch (Exception e) {

@@ -1,6 +1,6 @@
 package net.evenh.versionmonitor.domain.notifications;
 
-import net.evenh.versionmonitor.application.notifications.Notification;
+import net.evenh.versionmonitor.application.notifications.NotificationService;
 import net.evenh.versionmonitor.application.projects.AbstractProject;
 import net.evenh.versionmonitor.application.projects.ProjectService;
 import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
@@ -25,8 +25,8 @@ import java.util.Optional;
  * @since 2016-02-03
  */
 @Component
-public class SlackNotification implements Notification, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(SlackNotification.class);
+public class SlackNotificationService implements NotificationService, InitializingBean {
+  private static final Logger logger = LoggerFactory.getLogger(SlackNotificationService.class);
 
   @Autowired
   private VersionmonitorConfiguration props;

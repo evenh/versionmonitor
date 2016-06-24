@@ -4,11 +4,11 @@ import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
 import net.evenh.versionmonitor.domain.releases.Release;
 
 /**
- * A generic notification for notifying subscribers of new releases.
+ * An interface for notifying subscribers of new releases.
  *
  * @author Even Holthe
  * @since 2016-02-03
  */
-public interface Notification {
+public interface NotificationService {
   boolean sendNotification(Release release, AbstractSubscription subscription);
 }

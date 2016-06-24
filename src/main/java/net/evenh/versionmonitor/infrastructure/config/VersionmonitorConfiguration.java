@@ -110,12 +110,22 @@ public class VersionmonitorConfiguration {
 
       private int timeToLiveInDays = 1461;
 
+      private int cachesize = 10;
+
       public int getTimeToLiveInDays() {
         return timeToLiveInDays;
       }
 
       public void setTimeToLiveInDays(int timeToLiveInDays) {
         this.timeToLiveInDays = timeToLiveInDays;
+      }
+
+      public int getCachesize() {
+        return cachesize;
+      }
+
+      public void setCachesize(int cachesize) {
+        this.cachesize = cachesize;
       }
     }
   }
@@ -319,18 +329,9 @@ public class VersionmonitorConfiguration {
   }
 
   public static class Github {
-    private Integer cachesize = 10;
     private Integer ratelimitBuffer = 20;
     @NotNull
     private String oauthToken;
-
-    public Integer getCachesize() {
-      return cachesize;
-    }
-
-    public void setCachesize(Integer cachesize) {
-      this.cachesize = cachesize;
-    }
 
     public Integer getRatelimitBuffer() {
       return ratelimitBuffer;

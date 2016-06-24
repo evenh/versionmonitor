@@ -79,7 +79,6 @@ public class WebConfigurer implements ServletContextInitializer, EmbeddedServlet
     CorsConfiguration config = props.getCors();
     if (config.getAllowedOrigins() != null && !config.getAllowedOrigins().isEmpty()) {
       source.registerCorsConfiguration("/api/**", config);
-      source.registerCorsConfiguration("/oauth/**", config);
     }
     return new CorsFilter(source);
   }
