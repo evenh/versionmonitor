@@ -3,6 +3,7 @@ package net.evenh.versionmonitor.domain.releases;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import net.evenh.versionmonitor.domain.View;
+import net.evenh.versionmonitor.domain.projects.npm.NpmReleaseRepresentation;
 
 import org.kohsuke.github.GHRelease;
 import org.kohsuke.github.GHTag;
@@ -142,6 +143,15 @@ public class Release {
       } catch (IOException e) {
         this.createdAt = new Date(0);
       }
+
+      return this;
+    }
+
+    public ReleaseBuilder fromNpm(NpmReleaseRepresentation release, String identifier) {
+      this.version = release.getVersion();
+      this.createdAt = release.getReleased();
+      this.prerelease = null;
+      this.url = "https://www.npmjs.com/package/" + identifier;
 
       return this;
     }

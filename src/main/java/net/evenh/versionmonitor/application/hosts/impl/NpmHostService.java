@@ -1,16 +1,93 @@
 package net.evenh.versionmonitor.application.hosts.impl;
 
 import net.evenh.versionmonitor.application.hosts.HostRegistry;
+import net.evenh.versionmonitor.application.hosts.HostService;
+import net.evenh.versionmonitor.application.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.projects.NpmProject;
+import net.evenh.versionmonitor.domain.projects.npm.NpmProjectRepresentation;
+import net.evenh.versionmonitor.domain.releases.Release;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static net.evenh.versionmonitor.domain.releases.Release.ReleaseBuilder.builder;
 
 @Service("npmHostService")
-public class NpmHostService {
-  private static final Logger logger = LoggerFactory.getLogger(GitHubHostService.class);
+public class NpmHostService implements HostService, InitializingBean {
+  private static final Logger log = LoggerFactory.getLogger(GitHubHostService.class);
+  private static final String npmRegistry = "http://registry.npmjs.org/";
 
   @Autowired
   private HostRegistry registry;
+
+  @Autowired
+  private RestTemplate http;
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    registry.register(this);
+  }
+
+  @Override
+  public boolean validIdentifier(String identifier) {
+    // TODO: Find naming documentation for npm
+    return true;
+  }
+
+  @Override
+  public boolean satisfiedBy(AbstractProject project) {
+    return project instanceof NpmProject;
+  }
+
+  @Override
+  public String getHostIdentifier() {
+    return "npm";
+  }
+
+  @Override
+  public Optional<? extends AbstractProject> getProject(String identifier) {
+    try {
+      NpmProjectRepresentation npm = http.getForObject(npmRegistry + "/" + identifier, NpmProjectRepresentation.class);
+      log.debug("Successfully found NPM project: {}", identifier);
+      return Optional.of(createNpmProject(npm, identifier));
+    } catch (HttpClientErrorException e) {
+      log.warn("Got error while fetching NPM project: {}", identifier, e);
+      return Optional.empty();
+    }
+  }
+
+  @Override
+  public List<Release> check(AbstractProject project) throws Exception {
+    return null;
+  }
+
+  private NpmProject createNpmProject(NpmProjectRepresentation npm, String identifier) {
+    final NpmProject project = new NpmProject();
+
+    project.setName(npm.getName());
+    project.setDescription(npm.getDescription());
+    project.setIdentifier(identifier);
+
+    final List<Release> releases = new ArrayList<>();
+
+    // Map releases
+    npm.getReleases().forEach((key, value) -> {
+      value.setReleased(npm.getTime().get(key));
+
+      releases.add(builder().fromNpm(value, identifier).build());
+    });
+
+    project.setReleases(releases);
+
+    return project;
+  }
 }

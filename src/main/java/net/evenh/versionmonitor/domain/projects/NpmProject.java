@@ -7,16 +7,16 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * Represents a GitHub software project.
+ * Represents a NPM software project.
  */
 @Entity
-@Table(name = "projects_github")
-public class GitHubProject extends AbstractProject implements Project {
-  public GitHubProject() {
+@Table(name = "projects_npm")
+public class NpmProject extends AbstractProject implements Project {
+  public NpmProject() {
   }
 
   @Override
   public String getProjectUrl() {
-    return "https://github.com/" + getIdentifier();
+    return "https://www.npmjs.com/package/" + getIdentifier();
   }
 }
