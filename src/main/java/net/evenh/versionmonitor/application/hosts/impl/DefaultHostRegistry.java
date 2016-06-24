@@ -6,6 +6,8 @@ import net.evenh.versionmonitor.application.projects.AbstractProject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.actuate.health.AbstractHealthIndicator;
+import org.springframework.boot.actuate.health.Health;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -14,7 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Component
-public class DefaultHostRegistry implements HostRegistry {
+public class DefaultHostRegistry extends AbstractHealthIndicator implements HostRegistry {
   private static final Logger logger = LoggerFactory.getLogger(HostRegistry.class);
   private final Map<String, HostService> registry = new HashMap<>();
 
@@ -62,5 +64,12 @@ public class DefaultHostRegistry implements HostRegistry {
     }
 
     return Optional.empty();
+  }
+
+
+  @Override
+  protected void doHealthCheck(Health.Builder builder) throws Exception {
+    builder.withDetail("hosts_supported", getHosts());
+    builder.up();
   }
 }
