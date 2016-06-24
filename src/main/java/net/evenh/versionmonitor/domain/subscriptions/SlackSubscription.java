@@ -1,7 +1,10 @@
 package net.evenh.versionmonitor.domain.subscriptions;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import net.evenh.versionmonitor.api.commands.AddSubscriptionCommand;
 import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
+import net.evenh.versionmonitor.domain.View;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,6 +30,7 @@ public class SlackSubscription extends AbstractSubscription {
   }
 
   @Column(nullable = true)
+  @JsonView(View.Detail.class)
   private String channel;
 
   public String getChannel() {

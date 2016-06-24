@@ -4,7 +4,7 @@ import net.evenh.versionmonitor.application.hosts.HostRegistry;
 import net.evenh.versionmonitor.application.projects.AbstractProject;
 import net.evenh.versionmonitor.application.projects.Project;
 import net.evenh.versionmonitor.application.projects.ProjectRepository;
-import net.evenh.versionmonitor.domain.Release;
+import net.evenh.versionmonitor.domain.releases.Release;
 import net.evenh.versionmonitor.domain.notifications.SlackNotification;
 import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
 

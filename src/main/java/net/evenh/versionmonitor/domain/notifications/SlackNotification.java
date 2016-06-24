@@ -4,7 +4,7 @@ import net.evenh.versionmonitor.application.notifications.Notification;
 import net.evenh.versionmonitor.application.projects.AbstractProject;
 import net.evenh.versionmonitor.application.projects.ProjectRepository;
 import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
-import net.evenh.versionmonitor.domain.Release;
+import net.evenh.versionmonitor.domain.releases.Release;
 import net.evenh.versionmonitor.domain.subscriptions.SlackSubscription;
 import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
 import net.gpedro.integrations.slack.SlackApi;

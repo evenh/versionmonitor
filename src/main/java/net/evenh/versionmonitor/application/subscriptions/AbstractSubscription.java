@@ -1,6 +1,9 @@
 package net.evenh.versionmonitor.application.subscriptions;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import net.evenh.versionmonitor.api.commands.AddSubscriptionCommand;
+import net.evenh.versionmonitor.domain.View;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -23,14 +26,17 @@ public abstract class AbstractSubscription implements Subscription {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
+  @JsonView(View.Summary.class)
   private Long id;
 
   @NotNull
   @NotEmpty
+  @JsonView(View.Summary.class)
   private String name;
 
   @NotNull
   @NotEmpty
+  @JsonView(View.Summary.class)
   private String identifier;
 
   public Long getId() {

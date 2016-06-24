@@ -2,9 +2,12 @@ package net.evenh.versionmonitor.api.controllers;
 
 import com.google.common.collect.ImmutableMap;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import net.evenh.versionmonitor.api.commands.AddSubscriptionCommand;
 import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
 import net.evenh.versionmonitor.application.subscriptions.SubscriptionRepository;
+import net.evenh.versionmonitor.domain.View;
 import net.evenh.versionmonitor.domain.subscriptions.SlackSubscription;
 
 import org.slf4j.Logger;
@@ -30,6 +33,7 @@ public class SubscriptionController {
   @Autowired
   SubscriptionRepository subscriptionRepository;
 
+  @JsonView(View.Summary.class)
   @RequestMapping(method = RequestMethod.GET)
   public ResponseEntity getAll() {
     List<AbstractSubscription> subscriptions = subscriptionRepository.findAll();
@@ -41,6 +45,7 @@ public class SubscriptionController {
     return ResponseEntity.ok(subscriptions);
   }
 
+  @JsonView(View.Detail.class)
   @RequestMapping(value = "/{id}", method = RequestMethod.GET)
   public ResponseEntity getOne(@PathVariable Long id) {
     AbstractSubscription subscription = subscriptionRepository.findOne(id);
@@ -53,6 +58,7 @@ public class SubscriptionController {
   }
 
   // TODO: duplicate check
+  @JsonView(View.Detail.class)
   @RequestMapping(method = RequestMethod.POST)
   public ResponseEntity create(@RequestBody @Valid AddSubscriptionCommand command) {
     if (command.getService().equalsIgnoreCase("slack")) {

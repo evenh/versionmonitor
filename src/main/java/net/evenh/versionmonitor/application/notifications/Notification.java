@@ -1,7 +1,7 @@
 package net.evenh.versionmonitor.application.notifications;
 
 import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
-import net.evenh.versionmonitor.domain.Release;
+import net.evenh.versionmonitor.domain.releases.Release;
 
 /**
  * A generic notification for notifying subscribers of new releases.

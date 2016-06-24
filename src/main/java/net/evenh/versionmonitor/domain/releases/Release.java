@@ -1,4 +1,8 @@
-package net.evenh.versionmonitor.domain;
+package net.evenh.versionmonitor.domain.releases;
+
+import com.fasterxml.jackson.annotation.JsonView;
+
+import net.evenh.versionmonitor.domain.View;
 
 import org.kohsuke.github.GHRelease;
 import org.kohsuke.github.GHTag;
@@ -28,15 +32,19 @@ import javax.validation.constraints.NotNull;
 public class Release {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
+  @JsonView(View.Summary.class)
   private Long id;
 
   @NotNull
+  @JsonView(View.Summary.class)
   private String version;
 
   @NotNull
+  @JsonView(View.Detail.class)
   private String url;
 
   @Column(nullable = false)
+  @JsonView(View.Detail.class)
   private Date releasedAt;
 
   public Long getId() {

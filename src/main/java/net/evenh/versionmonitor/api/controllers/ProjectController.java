@@ -2,13 +2,16 @@ package net.evenh.versionmonitor.api.controllers;
 
 import com.google.common.collect.ImmutableMap;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import net.evenh.versionmonitor.api.commands.AddProjectCommand;
 import net.evenh.versionmonitor.application.hosts.HostRegistry;
 import net.evenh.versionmonitor.application.hosts.HostService;
-import net.evenh.versionmonitor.application.projects.ProjectRepository;
 import net.evenh.versionmonitor.application.projects.AbstractProject;
+import net.evenh.versionmonitor.application.projects.ProjectRepository;
 import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
 import net.evenh.versionmonitor.application.subscriptions.SubscriptionRepository;
+import net.evenh.versionmonitor.domain.View;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +56,7 @@ public class ProjectController {
    *
    * @return A list of existing projects.
    */
+  @JsonView(View.Summary.class)
   @RequestMapping(method = RequestMethod.GET)
   public ResponseEntity getAllProjects() {
     List<AbstractProject> projects = repository.findAll();
@@ -109,6 +113,7 @@ public class ProjectController {
    * @param id The primary key of an <code>AbstractProject</code>.
    * @return The project found by primary key on success, a JSON error response otherwise.
    */
+  @JsonView(View.Detail.class)
   @RequestMapping(value = "/{id}", method = RequestMethod.GET)
   public ResponseEntity getOne(@PathVariable Long id) {
     AbstractProject project = repository.findOne(id);
@@ -125,6 +130,7 @@ public class ProjectController {
    * @param id The id of the project.
    * @param subscriptionId The subscription id to link.
    */
+  @JsonView(View.Summary.class)
   @RequestMapping(value = "/{id}/subscribe/{subscriptionId}", method = RequestMethod.POST)
   public ResponseEntity addSubscriber(@PathVariable Long id, @PathVariable Long subscriptionId) {
     AbstractSubscription subscription = subscriptionRepository.findOne(subscriptionId);
@@ -156,6 +162,7 @@ public class ProjectController {
    * @param id The id of the project.
    * @param subscriptionId The subscription id to unlink.
    */
+  @JsonView(View.Summary.class)
   @RequestMapping(value = "/{id}/unsubscribe/{subscriptionId}", method = RequestMethod.POST)
   public ResponseEntity removeSubscriber(@PathVariable Long id, @PathVariable Long subscriptionId) {
     AbstractSubscription subscription = subscriptionRepository.findOne(subscriptionId);

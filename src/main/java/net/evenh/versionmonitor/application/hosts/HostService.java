@@ -1,6 +1,6 @@
 package net.evenh.versionmonitor.application.hosts;
 
-import net.evenh.versionmonitor.domain.Release;
+import net.evenh.versionmonitor.domain.releases.Release;
 import net.evenh.versionmonitor.application.projects.AbstractProject;
 
 import java.util.List;

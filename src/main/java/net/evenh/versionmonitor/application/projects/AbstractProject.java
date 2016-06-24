@@ -1,7 +1,10 @@
 package net.evenh.versionmonitor.application.projects;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
-import net.evenh.versionmonitor.domain.Release;
+import net.evenh.versionmonitor.domain.View;
+import net.evenh.versionmonitor.domain.releases.Release;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,22 +40,28 @@ public abstract class AbstractProject implements Project {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @JsonView(View.Summary.class)
   private Long id;
 
   @NotNull
+  @JsonView(View.Summary.class)
   private String name;
 
   @Column(nullable = true)
+  @JsonView(View.Summary.class)
   private String description;
 
   @NotNull
+  @JsonView(View.Summary.class)
   private String identifier;
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   @JoinColumn(name = "project_id")
+  @JsonView(View.Detail.class)
   private List<Release> releases;
 
   @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH}, fetch = FetchType.EAGER)
+  @JsonView(View.Detail.class)
   private Set<AbstractSubscription> subscriptions;
 
   public AbstractProject() {

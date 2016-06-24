@@ -1,7 +1,7 @@
 package net.evenh.versionmonitor.application.projects;
 
 import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
-import net.evenh.versionmonitor.domain.Release;
+import net.evenh.versionmonitor.domain.releases.Release;
 
 import java.util.List;
 import java.util.Set;
