@@ -16,8 +16,8 @@ Currently versionmonitor have support for checking the following hosts for new r
 - NPM
 ```
 
-### 2.2 Notification services
-The following ways of being notified of new releases is currently supported
+### Notification services
+The following ways of being notified of new releases is currently supported:
 
 ```
 - Slack
