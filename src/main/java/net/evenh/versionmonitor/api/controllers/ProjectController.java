@@ -10,7 +10,7 @@ import net.evenh.versionmonitor.application.hosts.HostService;
 import net.evenh.versionmonitor.application.projects.AbstractProject;
 import net.evenh.versionmonitor.application.projects.ProjectService;
 import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
-import net.evenh.versionmonitor.application.subscriptions.SubscriptionRepository;
+import net.evenh.versionmonitor.application.subscriptions.SubscriptionService;
 import net.evenh.versionmonitor.domain.View;
 
 import org.slf4j.Logger;
@@ -43,10 +43,10 @@ public class ProjectController {
   private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
   @Autowired
-  private ProjectService service;
+  private ProjectService projectService;
 
   @Autowired
-  SubscriptionRepository subscriptionRepository;
+  private SubscriptionService subscriptionService;
 
   @Autowired
   HostRegistry registry;
@@ -59,7 +59,7 @@ public class ProjectController {
   @JsonView(View.Summary.class)
   @RequestMapping(method = RequestMethod.GET)
   public ResponseEntity getAllProjects() {
-    List<AbstractProject> projects = service.findAll();
+    List<AbstractProject> projects = projectService.findAll();
 
     if (projects.isEmpty()) {
       return responseMessage("No projects exists", HttpStatus.NOT_FOUND);
@@ -87,7 +87,7 @@ public class ProjectController {
       if (hostname.equalsIgnoreCase(command.getHost())) {
 
         // Check for duplicates
-        if (service.doesExist(command.getIdentifier())) {
+        if (projectService.doesExist(command.getIdentifier())) {
           logger.info("Project '{}' does already exist in the database", command.getIdentifier());
           return responseMessage("This project already exists", HttpStatus.CONFLICT);
         }
@@ -96,7 +96,7 @@ public class ProjectController {
         Optional<? extends AbstractProject> project = hostService.getProject(command.getIdentifier());
 
         if (project.isPresent()) {
-          AbstractProject saved = service.persist(project.get());
+          AbstractProject saved = projectService.persist(project.get());
           logger.info("Successfully added project: {}", saved);
           return new ResponseEntity<>(saved, HttpStatus.CREATED);
         }
@@ -116,7 +116,7 @@ public class ProjectController {
   @JsonView(View.Detail.class)
   @RequestMapping(value = "/{id}", method = RequestMethod.GET)
   public ResponseEntity getOne(@PathVariable Long id) {
-    Optional<AbstractProject> project = service.findOne(id);
+    Optional<AbstractProject> project = projectService.findOne(id);
 
     if (!project.isPresent()) {
       return responseMessage("Project not found", HttpStatus.NOT_FOUND);
@@ -133,26 +133,26 @@ public class ProjectController {
   @JsonView(View.Summary.class)
   @RequestMapping(value = "/{id}/subscribe/{subscriptionId}", method = RequestMethod.POST)
   public ResponseEntity addSubscriber(@PathVariable Long id, @PathVariable Long subscriptionId) {
-    AbstractSubscription subscription = subscriptionRepository.findOne(subscriptionId);
-    Optional<AbstractProject> projectMaybe = service.findOne(id);
+    Optional<AbstractSubscription> subscriptionMaybe = subscriptionService.findOne(subscriptionId);
+    Optional<AbstractProject> projectMaybe = projectService.findOne(id);
 
     if (!projectMaybe.isPresent()) {
       return responseMessage("Project not found", HttpStatus.NOT_FOUND);
     }
 
-    if (subscription == null) {
+    if (!subscriptionMaybe.isPresent()) {
       return responseMessage("Subscription not found", HttpStatus.NOT_FOUND);
     }
 
     AbstractProject project = projectMaybe.get();
 
-    if (!project.addSubscription(subscription)) {
+    if (!project.addSubscription(subscriptionMaybe.get())) {
       return responseMessage("This subscription is already linked to project " + id, HttpStatus.CONFLICT);
     }
 
-    AbstractProject savedProject = service.persist(project);
+    AbstractProject savedProject = projectService.persist(project);
 
-    logger.info("Successfully added subscription for project {}: {}", savedProject, subscription);
+    logger.info("Successfully added subscription for project {}: {}", savedProject, subscriptionMaybe);
 
     return ResponseEntity.ok(savedProject);
   }
@@ -165,29 +165,29 @@ public class ProjectController {
   @JsonView(View.Summary.class)
   @RequestMapping(value = "/{id}/unsubscribe/{subscriptionId}", method = RequestMethod.POST)
   public ResponseEntity removeSubscriber(@PathVariable Long id, @PathVariable Long subscriptionId) {
-    AbstractSubscription subscription = subscriptionRepository.findOne(subscriptionId);
-    Optional<AbstractProject> projectMaybe = service.findOne(id);
+    Optional<AbstractSubscription> subscriptionMaybe = subscriptionService.findOne(subscriptionId);
+    Optional<AbstractProject> projectMaybe = projectService.findOne(id);
 
     if (!projectMaybe.isPresent()) {
       return responseMessage("Project not found", HttpStatus.NOT_FOUND);
     }
 
-    if (subscription == null) {
+    if (!subscriptionMaybe.isPresent()) {
       return responseMessage("Subscription not found", HttpStatus.NOT_FOUND);
     }
 
 
     AbstractProject project = projectMaybe.get();
 
-    if (!project.removeSubscription(subscription)) {
+    if (!project.removeSubscription(subscriptionMaybe.get())) {
       return responseMessage("The subscription does not exist for the project with " + id, HttpStatus.NOT_FOUND);
     }
 
 
 
-    AbstractProject savedProject = service.persist(project);
+    AbstractProject savedProject = projectService.persist(project);
 
-    logger.info("Successfully removed subscription for project {}: {}", savedProject, subscription);
+    logger.info("Successfully removed subscription for project {}: {}", savedProject, subscriptionMaybe);
 
     return ResponseEntity.ok(savedProject);
   }
@@ -200,13 +200,13 @@ public class ProjectController {
    */
   @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
   public ResponseEntity deleteOne(@PathVariable Long id) {
-    Optional<AbstractProject> project = service.findOne(id);
+    Optional<AbstractProject> project = projectService.findOne(id);
 
     if (!project.isPresent()) {
       return responseMessage("Project not found", HttpStatus.NOT_FOUND);
     }
 
-    service.delete(project.get());
+    projectService.delete(project.get());
 
     return ResponseEntity.noContent().build();
   }

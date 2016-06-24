@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import net.evenh.versionmonitor.api.commands.AddSubscriptionCommand;
 import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
-import net.evenh.versionmonitor.application.subscriptions.SubscriptionRepository;
+import net.evenh.versionmonitor.application.subscriptions.SubscriptionService;
 import net.evenh.versionmonitor.domain.View;
 import net.evenh.versionmonitor.domain.subscriptions.SlackSubscription;
 
@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -31,12 +32,12 @@ import javax.validation.Valid;
 public class SubscriptionController {
   private final static Logger log = LoggerFactory.getLogger(SubscriptionController.class);
   @Autowired
-  SubscriptionRepository subscriptionRepository;
+  private SubscriptionService subscriptionService;
 
   @JsonView(View.Summary.class)
   @RequestMapping(method = RequestMethod.GET)
   public ResponseEntity getAll() {
-    List<AbstractSubscription> subscriptions = subscriptionRepository.findAll();
+    List<AbstractSubscription> subscriptions = subscriptionService.findAll();
 
     if (subscriptions.isEmpty()) {
       return responseMessage("No subscriptions exists", HttpStatus.NOT_FOUND);
@@ -48,9 +49,9 @@ public class SubscriptionController {
   @JsonView(View.Detail.class)
   @RequestMapping(value = "/{id}", method = RequestMethod.GET)
   public ResponseEntity getOne(@PathVariable Long id) {
-    AbstractSubscription subscription = subscriptionRepository.findOne(id);
+    Optional<AbstractSubscription> subscription = subscriptionService.findOne(id);
 
-    if (subscription == null) {
+    if (!subscription.isPresent()) {
       return responseMessage("Subscription not found", HttpStatus.NOT_FOUND);
     }
 
@@ -62,7 +63,7 @@ public class SubscriptionController {
   @RequestMapping(method = RequestMethod.POST)
   public ResponseEntity create(@RequestBody @Valid AddSubscriptionCommand command) {
     if (command.getService().equalsIgnoreCase("slack")) {
-      final SlackSubscription saved = subscriptionRepository.save(new SlackSubscription(command));
+      final AbstractSubscription saved = subscriptionService.save(new SlackSubscription(command));
       log.info("Successfully saved subscription: {}", saved);
 
       return ResponseEntity.ok(saved);
@@ -73,13 +74,13 @@ public class SubscriptionController {
 
   @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
   public ResponseEntity deleteOne(@PathVariable Long id) {
-    AbstractSubscription subscription = subscriptionRepository.findOne(id);
+    Optional<AbstractSubscription> subscription = subscriptionService.findOne(id);
 
-    if (subscription == null) {
+    if (!subscription.isPresent()) {
       return responseMessage("Subscription not found", HttpStatus.NOT_FOUND);
     }
 
-    subscriptionRepository.delete(subscription);
+    subscriptionService.delete(subscription.get());
 
     return ResponseEntity.noContent().build();
   }
