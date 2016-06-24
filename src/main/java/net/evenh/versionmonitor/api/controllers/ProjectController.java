@@ -1,10 +1,14 @@
 package net.evenh.versionmonitor.api.controllers;
 
-import com.google.common.collect.ImmutableMap;
-
 import com.fasterxml.jackson.annotation.JsonView;
 
 import net.evenh.versionmonitor.api.commands.AddProjectCommand;
+import net.evenh.versionmonitor.api.exceptions.DuplicateProjectException;
+import net.evenh.versionmonitor.api.exceptions.NoProjectsExistsException;
+import net.evenh.versionmonitor.api.exceptions.ProjectNotFoundException;
+import net.evenh.versionmonitor.api.exceptions.SubscriptionAlreadyLinkedToProjectException;
+import net.evenh.versionmonitor.api.exceptions.SubscriptionNotFoundException;
+import net.evenh.versionmonitor.api.exceptions.UnknownProjectTypeException;
 import net.evenh.versionmonitor.application.hosts.HostRegistry;
 import net.evenh.versionmonitor.application.hosts.HostService;
 import net.evenh.versionmonitor.application.projects.AbstractProject;
@@ -18,14 +22,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,7 +64,7 @@ public class ProjectController {
     List<AbstractProject> projects = projectService.findAll();
 
     if (projects.isEmpty()) {
-      return responseMessage("No projects exists", HttpStatus.NOT_FOUND);
+      throw new NoProjectsExistsException();
     }
 
     return ResponseEntity.ok(projects);
@@ -72,16 +74,10 @@ public class ProjectController {
    * Add a new project.
    *
    * @param command A <code>AddProjectCommand</code>.
-   * @param result  Automatically populated validation results.
    * @return A project upon success, otherwise a JSON response describing failure.
    */
   @RequestMapping(method = RequestMethod.POST)
-  public ResponseEntity add(@RequestBody @Valid AddProjectCommand command, BindingResult result) {
-    if (result.hasErrors()) {
-      logger.debug("AddProjectCommand has validation errors", result.getAllErrors());
-      return new ResponseEntity<>(result.getAllErrors(), HttpStatus.BAD_REQUEST);
-    }
-
+  public ResponseEntity add(@Valid @RequestBody AddProjectCommand command) {
     // Loop through hosts and process request
     for (String hostname : registry.getHosts()) {
       if (hostname.equalsIgnoreCase(command.getHost())) {
@@ -89,7 +85,7 @@ public class ProjectController {
         // Check for duplicates
         if (projectService.doesExist(command.getIdentifier())) {
           logger.info("Project '{}' does already exist in the database", command.getIdentifier());
-          return responseMessage("This project already exists", HttpStatus.CONFLICT);
+          throw new DuplicateProjectException();
         }
 
         HostService hostService = registry.getHostService(hostname).get();
@@ -104,7 +100,7 @@ public class ProjectController {
       }
     }
 
-    return responseMessage("Unknown project type", HttpStatus.UNPROCESSABLE_ENTITY);
+    throw new UnknownProjectTypeException();
   }
 
   /**
@@ -119,7 +115,7 @@ public class ProjectController {
     Optional<AbstractProject> project = projectService.findOne(id);
 
     if (!project.isPresent()) {
-      return responseMessage("Project not found", HttpStatus.NOT_FOUND);
+      throw new ProjectNotFoundException();
     }
 
     return ResponseEntity.ok(project);
@@ -137,17 +133,17 @@ public class ProjectController {
     Optional<AbstractProject> projectMaybe = projectService.findOne(id);
 
     if (!projectMaybe.isPresent()) {
-      return responseMessage("Project not found", HttpStatus.NOT_FOUND);
+      throw new ProjectNotFoundException();
     }
 
     if (!subscriptionMaybe.isPresent()) {
-      return responseMessage("Subscription not found", HttpStatus.NOT_FOUND);
+      throw new SubscriptionNotFoundException();
     }
 
     AbstractProject project = projectMaybe.get();
 
     if (!project.addSubscription(subscriptionMaybe.get())) {
-      return responseMessage("This subscription is already linked to project " + id, HttpStatus.CONFLICT);
+      throw new SubscriptionAlreadyLinkedToProjectException();
     }
 
     AbstractProject savedProject = projectService.persist(project);
@@ -169,21 +165,19 @@ public class ProjectController {
     Optional<AbstractProject> projectMaybe = projectService.findOne(id);
 
     if (!projectMaybe.isPresent()) {
-      return responseMessage("Project not found", HttpStatus.NOT_FOUND);
+      throw new ProjectNotFoundException();
     }
 
     if (!subscriptionMaybe.isPresent()) {
-      return responseMessage("Subscription not found", HttpStatus.NOT_FOUND);
+      throw new SubscriptionNotFoundException();
     }
 
 
     AbstractProject project = projectMaybe.get();
 
     if (!project.removeSubscription(subscriptionMaybe.get())) {
-      return responseMessage("The subscription does not exist for the project with " + id, HttpStatus.NOT_FOUND);
+      throw new SubscriptionNotFoundException();
     }
-
-
 
     AbstractProject savedProject = projectService.persist(project);
 
@@ -203,15 +197,11 @@ public class ProjectController {
     Optional<AbstractProject> project = projectService.findOne(id);
 
     if (!project.isPresent()) {
-      return responseMessage("Project not found", HttpStatus.NOT_FOUND);
+      throw new ProjectNotFoundException();
     }
 
     projectService.delete(project.get());
 
     return ResponseEntity.noContent().build();
-  }
-
-  private ResponseEntity responseMessage(String message, HttpStatus status) {
-    return new ResponseEntity(ImmutableMap.of("timestamp", new Date(), "message", message), status);
   }
 }

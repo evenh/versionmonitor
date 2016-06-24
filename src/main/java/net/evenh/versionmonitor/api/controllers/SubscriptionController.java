@@ -1,10 +1,11 @@
 package net.evenh.versionmonitor.api.controllers;
 
-import com.google.common.collect.ImmutableMap;
-
 import com.fasterxml.jackson.annotation.JsonView;
 
 import net.evenh.versionmonitor.api.commands.AddSubscriptionCommand;
+import net.evenh.versionmonitor.api.exceptions.NoSubscriptionsExistsException;
+import net.evenh.versionmonitor.api.exceptions.SubscriptionNotFoundException;
+import net.evenh.versionmonitor.api.exceptions.UnknownSubscriptionServiceException;
 import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
 import net.evenh.versionmonitor.application.subscriptions.SubscriptionService;
 import net.evenh.versionmonitor.domain.View;
@@ -13,7 +14,6 @@ import net.evenh.versionmonitor.domain.subscriptions.SlackSubscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,7 +39,7 @@ public class SubscriptionController {
     List<AbstractSubscription> subscriptions = subscriptionService.findAll();
 
     if (subscriptions.isEmpty()) {
-      return responseMessage("No subscriptions exists", HttpStatus.NOT_FOUND);
+      throw new NoSubscriptionsExistsException();
     }
 
     return ResponseEntity.ok(subscriptions);
@@ -52,7 +51,7 @@ public class SubscriptionController {
     Optional<AbstractSubscription> subscription = subscriptionService.findOne(id);
 
     if (!subscription.isPresent()) {
-      return responseMessage("Subscription not found", HttpStatus.NOT_FOUND);
+      throw new SubscriptionNotFoundException();
     }
 
     return ResponseEntity.ok(subscription);
@@ -69,7 +68,7 @@ public class SubscriptionController {
       return ResponseEntity.ok(saved);
     }
 
-    return responseMessage("Unknown service", HttpStatus.BAD_REQUEST);
+    throw new UnknownSubscriptionServiceException();
   }
 
   @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -77,16 +76,11 @@ public class SubscriptionController {
     Optional<AbstractSubscription> subscription = subscriptionService.findOne(id);
 
     if (!subscription.isPresent()) {
-      return responseMessage("Subscription not found", HttpStatus.NOT_FOUND);
+      throw new SubscriptionNotFoundException();
     }
 
     subscriptionService.delete(subscription.get());
 
     return ResponseEntity.noContent().build();
-  }
-
-  // TODO: Not do it like this :-)
-  private ResponseEntity responseMessage(String message, HttpStatus status) {
-    return new ResponseEntity(ImmutableMap.of("timestamp", new Date(), "message", message), status);
   }
 }
