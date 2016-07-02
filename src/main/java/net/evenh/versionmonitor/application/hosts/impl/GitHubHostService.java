@@ -8,7 +8,7 @@ import net.evenh.versionmonitor.application.hosts.HostService;
 import net.evenh.versionmonitor.application.projects.AbstractProject;
 import net.evenh.versionmonitor.application.projects.ProjectService;
 import net.evenh.versionmonitor.application.releases.ReleaseRepository;
-import net.evenh.versionmonitor.domain.projects.GitHubProject;
+import net.evenh.versionmonitor.domain.projects.github.GitHubProject;
 import net.evenh.versionmonitor.domain.releases.Release;
 import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
 

@@ -1,4 +1,4 @@
-package net.evenh.versionmonitor.domain.projects;
+package net.evenh.versionmonitor.domain.projects.github;
 
 import net.evenh.versionmonitor.application.projects.AbstractProject;
 import net.evenh.versionmonitor.application.projects.Project;

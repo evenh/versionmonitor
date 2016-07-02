@@ -5,7 +5,7 @@ import net.evenh.versionmonitor.application.hosts.HostService;
 import net.evenh.versionmonitor.application.projects.AbstractProject;
 import net.evenh.versionmonitor.application.projects.ProjectService;
 import net.evenh.versionmonitor.application.releases.ReleaseRepository;
-import net.evenh.versionmonitor.domain.projects.NpmProject;
+import net.evenh.versionmonitor.domain.projects.npm.NpmProject;
 import net.evenh.versionmonitor.domain.projects.npm.NpmProjectRepresentation;
 import net.evenh.versionmonitor.domain.releases.Release;
 
