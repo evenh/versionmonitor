@@ -49,8 +49,8 @@ public class NpmHostService implements HostService, InitializingBean {
 
   @Override
   public boolean validIdentifier(String identifier) {
-    // TODO: Find naming documentation for npm
-    return true;
+    return !(identifier == null || identifier.isEmpty() || identifier.length() > 214)
+        && !(identifier.startsWith(".") || identifier.startsWith("-") || identifier.startsWith("_"));
   }
 
   @Override
@@ -94,14 +94,14 @@ public class NpmHostService implements HostService, InitializingBean {
     try {
       Optional<? extends AbstractProject> remoteProject = getProject(project.getIdentifier());
 
-      if(!remoteProject.isPresent()) {
+      if (!remoteProject.isPresent()) {
         log.warn(prefix + "Could not read project {} from NPM.", project.getIdentifier());
         return newReleases;
       } else {
         remoteProject.ifPresent(npmProject -> {
 
           npmProject.getReleases().forEach(release -> {
-            if(!existingReleases.contains(release.getVersion())) {
+            if (!existingReleases.contains(release.getVersion())) {
               releases.saveAndFlush(release);
               newReleases.add(release);
             }
