@@ -1,0 +1,11 @@
+language: java
+jdk: oraclejdk8
+sudo: required
+
+env:
+- secure: "V5SkdfnXZQffyUxA2HjfuW9wJC9IbQpZwUf0n2BCtrQVMjV69TQMrVspc6iltFTfeJgTJ5hGPNtzTWUjt8D+kPfsPRSF98b4AE3nUBKKjW2HadzkEXs2caHYnUEp+VxgDOWVdZJ8l2COE9jTEqCd7KlnpH2RRm9R5DLm6bySln5QW1hs5BmmaqB+Srh8jJplQKp6PbXaBRZa7kx1280YBUgS5R9ZQMV9/siSzmxCdJbul9tPZgQ0ZzazSuHLqCTXdawG8pnKgI+bPk3pQiZef8uotHI2IL4aMg+YfWkYf2J3Hxw4lslTjgeZxF87IZ59V/S8yM31K6j6hrsddkBctPbxOYvlT3jAmoDgpyFsSaLH5sIxLwjdOLhzkUx8SWZ/xGvhfDNndPfcTyD0K6DCZ4ih1G6AT7CIc8Cvl5NCLiGWKYQfWgC+Sqn61a0NR6EpRxdx+yu+/GDa9+iywgQspGON8p2SoZWm/sWZMVFkp/wE0hXiT2IaLMy1PDHFBl/HzE3naMGGasdWXE+N8ZtBgVsI5jPXJHyeOzwMyWRH4g+3YLKkblr1Q3dxfPV4TgK0S39M4Kyy0GzMMJ75+e3KejGU89c5XUGlI/hvu8DVpRXI8an8xUHN+QcbqkM+WiFYUHxWiaZTzx+qpL1EyEDtU9x+hJnOjJgtBvbSSQOdd0c="
+
+after_success:
+- curl https://www.jpm4j.org/install/script | sudo sh
+- sudo jpm install com.codacy:codacy-coverage-reporter:assembly
+- codacy-coverage-reporter -l Java -r coverage.xml
