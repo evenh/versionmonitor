@@ -18,12 +18,6 @@ import javax.validation.constraints.NotNull;
 @Entity(name = "subscriptions")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class AbstractSubscription implements Subscription {
-  public AbstractSubscription() {
-  }
-
-  public AbstractSubscription(AddSubscriptionCommand command) {
-  }
-
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @JsonView(View.Summary.class)
@@ -38,6 +32,12 @@ public abstract class AbstractSubscription implements Subscription {
   @NotEmpty
   @JsonView(View.Summary.class)
   private String identifier;
+
+  public AbstractSubscription() {
+  }
+
+  public AbstractSubscription(AddSubscriptionCommand command) {
+  }
 
   public Long getId() {
     return id;

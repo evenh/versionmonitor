@@ -44,6 +44,8 @@
     <logstash-logback-encoder.version>4.6</logstash-logback-encoder.version>
     <run.addResources>false</run.addResources>
     <okhttp.version>2.7.5</okhttp.version>
+    <jacoco.version>0.7.7.201606060606</jacoco.version>
+    <dropwizard-metrics.version>3.1.2</dropwizard-metrics.version>
   </properties>
 
   <dependencies>
@@ -189,7 +191,11 @@
       <artifactId>jackson-datatype-jdk8</artifactId>
     </dependency>
 
-
+    <dependency>
+      <groupId>org.jacoco</groupId>
+      <artifactId>jacoco-maven-plugin</artifactId>
+      <version>${jacoco.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -216,6 +222,26 @@
             </resource>
           </resources>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco.version}</version>
+        <executions>
+          <execution>
+            <id>default-prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>default-report</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
