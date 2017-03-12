@@ -13,7 +13,7 @@ import net.evenh.versionmonitor.domain.hosts.HostRegistry;
 import net.evenh.versionmonitor.domain.hosts.HostService;
 import net.evenh.versionmonitor.domain.projects.Project;
 import net.evenh.versionmonitor.domain.projects.ProjectService;
-import net.evenh.versionmonitor.domain.subscriptions.AbstractSubscription;
+import net.evenh.versionmonitor.domain.subscriptions.Subscription;
 import net.evenh.versionmonitor.application.subscriptions.SubscriptionService;
 import net.evenh.versionmonitor.infrastructure.View;
 
@@ -122,14 +122,14 @@ public class ProjectController {
   }
 
   /**
-   * Links a <code>AbstractSubscription</code> to a given projet.
+   * Links a <code>Subscription</code> to a given projet.
    * @param id The id of the project.
    * @param subscriptionId The subscription id to link.
    */
   @JsonView(View.Summary.class)
   @RequestMapping(value = "/{id}/subscribe/{subscriptionId}", method = RequestMethod.POST)
   public ResponseEntity addSubscriber(@PathVariable Long id, @PathVariable Long subscriptionId) {
-    Optional<AbstractSubscription> subscriptionMaybe = subscriptionService.findOne(subscriptionId);
+    Optional<Subscription> subscriptionMaybe = subscriptionService.findOne(subscriptionId);
     Optional<Project> projectMaybe = projectService.findOne(id);
 
     if (!projectMaybe.isPresent()) {
@@ -154,14 +154,14 @@ public class ProjectController {
   }
 
   /**
-   * Unlinks a <code>AbstractSubscription</code> from a given projet.
+   * Unlinks a <code>Subscription</code> from a given projet.
    * @param id The id of the project.
    * @param subscriptionId The subscription id to unlink.
    */
   @JsonView(View.Summary.class)
   @RequestMapping(value = "/{id}/unsubscribe/{subscriptionId}", method = RequestMethod.POST)
   public ResponseEntity removeSubscriber(@PathVariable Long id, @PathVariable Long subscriptionId) {
-    Optional<AbstractSubscription> subscriptionMaybe = subscriptionService.findOne(subscriptionId);
+    Optional<Subscription> subscriptionMaybe = subscriptionService.findOne(subscriptionId);
     Optional<Project> projectMaybe = projectService.findOne(id);
 
     if (!projectMaybe.isPresent()) {

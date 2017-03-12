@@ -1,6 +1,6 @@
 package net.evenh.versionmonitor.domain.notifications;
 
-import net.evenh.versionmonitor.domain.subscriptions.AbstractSubscription;
+import net.evenh.versionmonitor.domain.subscriptions.Subscription;
 import net.evenh.versionmonitor.domain.releases.Release;
 
 /**
@@ -10,5 +10,5 @@ import net.evenh.versionmonitor.domain.releases.Release;
  * @since 2016-02-03
  */
 public interface NotificationService {
-  boolean sendNotification(Release release, AbstractSubscription subscription);
+  boolean sendNotification(Release release, Subscription subscription);
 }

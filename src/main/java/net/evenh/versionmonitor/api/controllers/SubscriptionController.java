@@ -6,10 +6,10 @@ import net.evenh.versionmonitor.api.commands.AddSubscriptionCommand;
 import net.evenh.versionmonitor.api.exceptions.NoSubscriptionsExistsException;
 import net.evenh.versionmonitor.api.exceptions.SubscriptionNotFoundException;
 import net.evenh.versionmonitor.api.exceptions.UnknownSubscriptionServiceException;
-import net.evenh.versionmonitor.domain.subscriptions.AbstractSubscription;
+import net.evenh.versionmonitor.domain.subscriptions.Subscription;
 import net.evenh.versionmonitor.application.subscriptions.SubscriptionService;
 import net.evenh.versionmonitor.infrastructure.View;
-import net.evenh.versionmonitor.application.subscriptions.SlackSubscription;
+import net.evenh.versionmonitor.application.subscriptions.types.SlackSubscription;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public class SubscriptionController {
   @JsonView(View.Summary.class)
   @RequestMapping(method = RequestMethod.GET)
   public ResponseEntity getAll() {
-    List<AbstractSubscription> subscriptions = subscriptionService.findAll();
+    List<Subscription> subscriptions = subscriptionService.findAll();
 
     if (subscriptions.isEmpty()) {
       throw new NoSubscriptionsExistsException();
@@ -48,7 +48,7 @@ public class SubscriptionController {
   @JsonView(View.Detail.class)
   @RequestMapping(value = "/{id}", method = RequestMethod.GET)
   public ResponseEntity getOne(@PathVariable Long id) {
-    Optional<AbstractSubscription> subscription = subscriptionService.findOne(id);
+    Optional<Subscription> subscription = subscriptionService.findOne(id);
 
     if (!subscription.isPresent()) {
       throw new SubscriptionNotFoundException();
@@ -62,7 +62,7 @@ public class SubscriptionController {
   @RequestMapping(method = RequestMethod.POST)
   public ResponseEntity create(@RequestBody @Valid AddSubscriptionCommand command) {
     if (command.getService().equalsIgnoreCase("slack")) {
-      final AbstractSubscription saved = subscriptionService.save(new SlackSubscription(command));
+      final Subscription saved = subscriptionService.save(new SlackSubscription(command));
       log.info("Successfully saved subscription: {}", saved);
 
       return ResponseEntity.ok(saved);
@@ -73,7 +73,7 @@ public class SubscriptionController {
 
   @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
   public ResponseEntity deleteOne(@PathVariable Long id) {
-    Optional<AbstractSubscription> subscription = subscriptionService.findOne(id);
+    Optional<Subscription> subscription = subscriptionService.findOne(id);
 
     if (!subscription.isPresent()) {
       throw new SubscriptionNotFoundException();

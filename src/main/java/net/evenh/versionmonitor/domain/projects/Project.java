@@ -17,7 +17,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import net.evenh.versionmonitor.domain.releases.Release;
-import net.evenh.versionmonitor.domain.subscriptions.AbstractSubscription;
+import net.evenh.versionmonitor.domain.subscriptions.Subscription;
 import net.evenh.versionmonitor.infrastructure.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +72,7 @@ public abstract class Project {
    */
   @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH}, fetch = FetchType.EAGER)
   @JsonView(View.Detail.class)
-  private Set<AbstractSubscription> subscriptions;
+  private Set<Subscription> subscriptions;
 
   public Project() {
   }
@@ -125,11 +125,11 @@ public abstract class Project {
     releases.add(release);
   }
 
-  public void setSubscriptions(Set<AbstractSubscription> subscriptions) {
+  public void setSubscriptions(Set<Subscription> subscriptions) {
     this.subscriptions = subscriptions;
   }
 
-  public boolean addSubscription(AbstractSubscription subscription) {
+  public boolean addSubscription(Subscription subscription) {
     if (subscriptions.contains(subscription)) {
       log.debug("Subscription does already exist - won't add: {}", subscription);
       return false;
@@ -140,7 +140,7 @@ public abstract class Project {
     return true;
   }
 
-  public boolean removeSubscription(AbstractSubscription subscription) {
+  public boolean removeSubscription(Subscription subscription) {
     if (!subscriptions.contains(subscription)) {
       log.debug("Subscription does not exist - won't remove: {}", subscription);
       return false;
@@ -151,7 +151,7 @@ public abstract class Project {
     return true;
   }
 
-  public Set<AbstractSubscription> getSubscriptions() {
+  public Set<Subscription> getSubscriptions() {
     return subscriptions;
   }
 

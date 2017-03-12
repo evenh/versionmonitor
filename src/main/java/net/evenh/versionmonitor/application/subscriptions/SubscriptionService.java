@@ -2,7 +2,7 @@ package net.evenh.versionmonitor.application.subscriptions;
 
 import java.util.List;
 import java.util.Optional;
-import net.evenh.versionmonitor.domain.subscriptions.AbstractSubscription;
+import net.evenh.versionmonitor.domain.subscriptions.Subscription;
 import net.evenh.versionmonitor.domain.subscriptions.SubscriptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,28 +20,28 @@ public class SubscriptionService {
   /**
    * Finds all subscriptions persisted in the database.
    */
-  public List<AbstractSubscription> findAll() {
+  public List<Subscription> findAll() {
     return repository.findAll();
   }
 
   /**
    * Finds a subscription by id.
    */
-  public Optional<AbstractSubscription> findOne(Long id) {
+  public Optional<Subscription> findOne(Long id) {
     return Optional.ofNullable(repository.findOne(id));
   }
 
   /**
    * Persists a subscription.
    */
-  public AbstractSubscription save(AbstractSubscription subscription) {
+  public Subscription save(Subscription subscription) {
     return repository.saveAndFlush(subscription);
   }
 
   /**
    * Deletes a subscription.
    */
-  public void delete(AbstractSubscription subscription) {
+  public void delete(Subscription subscription) {
     repository.delete(subscription);
   }
 }

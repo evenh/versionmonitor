@@ -1,22 +1,18 @@
-package net.evenh.versionmonitor.application.subscriptions;
+package net.evenh.versionmonitor.application.subscriptions.types;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import net.evenh.versionmonitor.api.commands.AddSubscriptionCommand;
-import net.evenh.versionmonitor.domain.subscriptions.AbstractSubscription;
+import net.evenh.versionmonitor.domain.subscriptions.Subscription;
 import net.evenh.versionmonitor.infrastructure.View;
 
 /**
  * A subscription of new release notifications.
- *
- * @author Even Holthe
- * @since 2016-02-03
  */
 @Entity
-@Table(name = "subscriptions_slack")
-public class SlackSubscription extends AbstractSubscription {
+@Table(name = "subscription_slack")
+public class SlackSubscription extends Subscription {
   public SlackSubscription() {
     super();
   }
@@ -27,7 +23,6 @@ public class SlackSubscription extends AbstractSubscription {
     this.setChannel(command.getChannel());
   }
 
-  @Column(nullable = true)
   @JsonView(View.Detail.class)
   private String channel;
 

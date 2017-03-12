@@ -1,18 +1,17 @@
 package net.evenh.versionmonitor.application.notifications;
 
 import java.util.Optional;
+import net.evenh.versionmonitor.application.subscriptions.types.SlackSubscription;
 import net.evenh.versionmonitor.domain.notifications.NotificationService;
 import net.evenh.versionmonitor.domain.projects.Project;
 import net.evenh.versionmonitor.domain.projects.ProjectService;
-import net.evenh.versionmonitor.domain.subscriptions.AbstractSubscription;
 import net.evenh.versionmonitor.domain.releases.Release;
-import net.evenh.versionmonitor.application.subscriptions.SlackSubscription;
+import net.evenh.versionmonitor.domain.subscriptions.Subscription;
 import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
 import net.gpedro.integrations.slack.SlackApi;
 import net.gpedro.integrations.slack.SlackMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +22,7 @@ import org.springframework.stereotype.Component;
  * @since 2016-02-03
  */
 @Component
-public class SlackNotificationService implements NotificationService, InitializingBean {
+public class SlackNotificationService implements NotificationService {
   private static final Logger logger = LoggerFactory.getLogger(SlackNotificationService.class);
 
   @Autowired
@@ -32,15 +31,8 @@ public class SlackNotificationService implements NotificationService, Initializi
   @Autowired
   private ProjectService service;
 
-  private String botname;
-
   @Override
-  public void afterPropertiesSet() throws Exception {
-    this.botname = props.getSlack().getBotname();
-  }
-
-  @Override
-  public boolean sendNotification(Release release, AbstractSubscription subscription) {
+  public boolean sendNotification(Release release, Subscription subscription) {
     if(!(subscription instanceof SlackSubscription)) {
       throw new IllegalStateException("Expected an instance of SlackSubscription");
     }
@@ -91,7 +83,7 @@ public class SlackNotificationService implements NotificationService, Initializi
               + project.getName()
               + "> is available";
 
-      SlackMessage msg = new SlackMessage(botname, rawText);
+      SlackMessage msg = new SlackMessage(props.getSlack().getBotname(), rawText);
       msg.setIcon(":exclamation:");
 
       return Optional.of(msg);
