@@ -8,7 +8,7 @@ import net.evenh.versionmonitor.domain.projects.Project;
  * Represents a GitHub software project.
  */
 @Entity
-@Table(name = "projects_github")
+@Table(name = "project_github")
 public class GitHubProject extends Project {
   public GitHubProject() {
   }

@@ -8,7 +8,7 @@ import net.evenh.versionmonitor.domain.projects.Project;
  * Represents a NPM software project.
  */
 @Entity
-@Table(name = "projects_npm")
+@Table(name = "project_npm")
 public class NpmProject extends Project {
   public NpmProject() {
   }
