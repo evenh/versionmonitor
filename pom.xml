@@ -121,7 +121,7 @@
       <plugin>
         <groupId>com.spotify</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>0.4.1</version>
+        <version>0.4.13</version>
         <configuration>
           <imageName>versionmonitor</imageName>
           <dockerDirectory>src/main/docker</dockerDirectory>
