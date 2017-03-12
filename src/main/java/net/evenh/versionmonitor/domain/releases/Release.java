@@ -1,7 +1,6 @@
 package net.evenh.versionmonitor.domain.releases;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,9 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import net.evenh.versionmonitor.infrastructure.View;
-import net.evenh.versionmonitor.application.hosts.npm.NpmReleaseRepresentation;
-import org.kohsuke.github.GHRelease;
-import org.kohsuke.github.GHTag;
 
 /**
  * Represents a release.
@@ -88,6 +84,10 @@ public class Release {
             + '}';
   }
 
+  public static ReleaseBuilder builder() {
+    return new ReleaseBuilder();
+  }
+
 
   /**
    * Constructs a Release object using the Builder pattern.
@@ -95,14 +95,9 @@ public class Release {
   public static class ReleaseBuilder {
     private String version;
     private String url;
-    private Boolean prerelease;
     private Date createdAt;
 
     private ReleaseBuilder() {
-    }
-
-    public static ReleaseBuilder builder() {
-      return new ReleaseBuilder();
     }
 
     public ReleaseBuilder withVersion(String version) {
@@ -115,58 +110,8 @@ public class Release {
       return this;
     }
 
-    public ReleaseBuilder withPrerelease(Boolean prerelease) {
-      this.prerelease = prerelease;
-      return this;
-    }
-
     public ReleaseBuilder withCreatedAt(Date createdAt) {
       this.createdAt = createdAt;
-      return this;
-    }
-
-    /**
-     * Populates all necessary fields using a GitHub tag.
-     *
-     * @param tag A <code>GHTag</code> object
-     */
-    public ReleaseBuilder fromGitHub(GHTag tag, String identifier) {
-      this.version = tag.getName();
-      this.url = "https://github.com/" + identifier + "/releases/tag/" + this.version;
-      this.prerelease = null;
-      try {
-        this.createdAt = tag.getCommit().getAuthoredDate();
-      } catch (IOException e) {
-        this.createdAt = new Date(0);
-      }
-
-      return this;
-    }
-
-    public ReleaseBuilder fromNpm(NpmReleaseRepresentation release, String identifier) {
-      this.version = release.getVersion();
-      this.createdAt = release.getReleased();
-      this.prerelease = null;
-      this.url = "https://www.npmjs.com/package/" + identifier;
-
-      return this;
-    }
-
-    /**
-     * Populates all necessary fields using a GitHub release.
-     *
-     * @param release A <code>GHRelease</code> object
-     */
-    public ReleaseBuilder fromGitHub(GHRelease release) {
-      this.version = release.getTagName();
-      this.url = release.getHtmlUrl().toString();
-      this.prerelease = release.isPrerelease();
-      try {
-        this.createdAt = release.getCreatedAt();
-      } catch (IOException e) {
-        this.createdAt = new Date(0);
-      }
-
       return this;
     }
 

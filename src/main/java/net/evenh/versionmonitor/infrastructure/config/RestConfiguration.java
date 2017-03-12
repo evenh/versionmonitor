@@ -23,7 +23,8 @@ public class RestConfiguration {
 
   @Bean
   public Cache cache(VersionmonitorConfiguration props) {
-    final File cacheDir = new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
+    final String randomFileName = UUID.randomUUID().toString();
+    final File cacheDir = new File(System.getProperty("java.io.tmpdir"), randomFileName);
     final Integer cacheSize = props.getHttp().getCache().getCachesize();
 
     return new Cache(cacheDir, cacheSize * 1024 * 1024);

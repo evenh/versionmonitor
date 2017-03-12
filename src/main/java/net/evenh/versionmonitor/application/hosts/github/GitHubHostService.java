@@ -1,12 +1,13 @@
 package net.evenh.versionmonitor.application.hosts.github;
 
-import static net.evenh.versionmonitor.domain.releases.Release.ReleaseBuilder;
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import net.evenh.versionmonitor.domain.releases.ReleaseRepository;
 import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
 import org.kohsuke.github.GHRateLimit;
 import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHTag;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import org.kohsuke.github.extras.OkHttpConnector;
@@ -39,8 +41,11 @@ import org.springframework.stereotype.Service;
  * @since 2016-01-09
  */
 @Service("gitHubHostService")
-public class GitHubHostService extends AbstractHealthIndicator implements HostService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(GitHubHostService.class);
+public class GitHubHostService extends AbstractHealthIndicator
+    implements HostService, InitializingBean {
+
+  private static final Logger log = LoggerFactory.getLogger(GitHubHostService.class);
+  private final Pattern repoId = Pattern.compile("^[a-z0-9-_]+/[a-z0-9-_]+$", CASE_INSENSITIVE);
 
   @Autowired
   private HostRegistry registry;
@@ -57,12 +62,6 @@ public class GitHubHostService extends AbstractHealthIndicator implements HostSe
   @Autowired
   private OkHttpClient httpClient;
 
-  private String authToken;
-
-  private Integer rateLimitBuffer;
-
-  private Integer cacheSize;
-
   private GitHub gitHub;
 
   private GitHubHostService() {
@@ -78,79 +77,29 @@ public class GitHubHostService extends AbstractHealthIndicator implements HostSe
    */
   @Override
   public void afterPropertiesSet() throws IllegalArgumentException, IOException {
-    this.authToken = props.getGithub().getOauthToken();
-    this.rateLimitBuffer = props.getGithub().getRatelimitBuffer();
+    final String authToken = props.getGithub().getOauthToken();
 
+    // Validate token
     if (authToken == null || authToken.isEmpty()) {
       throw new IllegalArgumentException("Missing GitHub OAuth2 token");
     }
 
+    // Setup GitHub connection and validate token
     try {
       gitHub = GitHubBuilder
         .fromEnvironment()
         .withOAuthToken(authToken)
-        .withConnector(new OkHttpConnector(
-          new OkUrlFactory(httpClient)
-        ))
+        .withConnector(new OkHttpConnector(new OkUrlFactory(httpClient)))
         .build();
     } catch (IOException e) {
-      logger.warn("Caught exception while connecting to GitHub", e);
+      log.warn("Caught exception while establishing a connection to GitHub", e);
       throw e;
     }
 
     // Register GitHubHostService with the host registry
     registry.register(this);
 
-    logger.info("GitHub service up and running. Logged in as: {}", gitHub.getMyself().getLogin());
-  }
-
-
-  /**
-   * Constructs a <code>GHRepository</code> with populated data for a given identifier.
-   *
-   * @param ownerRepo A username and project in this form: <code>apple/swift</code> for describing
-   *                  the repository located at https://github.com/apple/swift.
-   * @return A populated <code>GHRepository</code> object with data about the requested repository.
-   * Contains metadata and releases amongst other data.
-   * @throws IllegalArgumentException Thrown if a malformed project identifier is provided as the
-   *                                  input argument.
-   * @throws FileNotFoundException    Thrown if the repository does not exist.
-   */
-  public Optional<GHRepository> getRepository(final String ownerRepo) throws IllegalArgumentException,
-    FileNotFoundException {
-    logger.debug("Processing repository with identifier: {}", ownerRepo);
-
-    if (ownerRepo == null || ownerRepo.isEmpty()) {
-      throw new IllegalArgumentException("GitHub repository identifier is missing");
-    } else if (!validIdentifier(ownerRepo)) {
-      throw new IllegalArgumentException("Illegal GitHub repository identifier: " + ownerRepo);
-    }
-
-    try {
-      return Optional.ofNullable(gitHub.getRepository(ownerRepo));
-    } catch (FileNotFoundException e) {
-      logger.info("GitHub repository does not exist: {}", ownerRepo);
-      throw e;
-    } catch (IOException e) {
-      logger.warn("Got exception while fetching repository", e);
-    }
-
-    return Optional.empty();
-  }
-
-  /**
-   * Gets information about the remaining rate limit.
-   *
-   * @return A optional <code>GHRateLimit</code> object.
-   */
-  public Optional<GHRateLimit> getRateLimit() {
-    try {
-      return Optional.ofNullable(gitHub.getRateLimit());
-    } catch (IOException e) {
-      logger.warn("Got exception while requesting rate limit", e);
-    }
-
-    return Optional.empty();
+    log.info("GitHub service up and running. Logged in as: {}", gitHub.getMyself().getLogin());
   }
 
   @Override
@@ -172,11 +121,11 @@ public class GitHubHostService extends AbstractHealthIndicator implements HostSe
 
       return Optional.empty();
     } catch (IllegalArgumentException e) {
-      logger.warn("Illegal arguments were supplied to the GitHubHostService", e);
+      log.warn("Illegal arguments were supplied to the GitHubHostService", e);
     } catch (FileNotFoundException e) {
-      logger.warn("Project not found: {}", identifier);
+      log.warn("Project not found: {}", identifier);
     } catch (Exception e) {
-      logger.warn("Encountered problems using the GitHub service", e);
+      log.warn("Encountered problems using the GitHub service", e);
     }
 
     return Optional.empty();
@@ -184,10 +133,7 @@ public class GitHubHostService extends AbstractHealthIndicator implements HostSe
 
   @Override
   public boolean validIdentifier(String identifier) {
-    final Pattern matcher = Pattern.compile("^[a-z0-9-_]+/[a-z0-9-_]+$",
-      Pattern.CASE_INSENSITIVE);
-
-    return matcher.matcher(identifier).matches();
+    return repoId.matcher(identifier).matches();
   }
 
   @Override
@@ -208,31 +154,27 @@ public class GitHubHostService extends AbstractHealthIndicator implements HostSe
     List<Release> newReleases = new ArrayList<>();
 
     if (hasReachedRateLimit()) {
-      logger.info(prefix + "Reached GitHub rate limit. Returning empty list of new releases.");
+      log.info(prefix + "Reached GitHub rate limit. Returning empty list of new releases.");
       return newReleases;
     }
 
     List<String> existingReleases = project.getReleases().stream()
-      .map(Release::getVersion)
-      .collect(Collectors.toList());
+        .map(Release::getVersion)
+        .collect(Collectors.toList());
 
     try {
       Optional<GHRepository> repo = getRepository(project.getIdentifier());
 
       if (!repo.isPresent()) {
-        logger.warn(prefix + "Could not read fetch repo from database. Returning!");
+        log.warn(prefix + "Could not read fetch repo from database. Returning!");
         return newReleases;
       } else {
         repo.ifPresent(ghRepo -> {
           try {
             ghRepo.listTags().forEach(tag -> {
               if (!existingReleases.contains(tag.getName())) {
-                Release newRelease = ReleaseBuilder.builder()
-                  .fromGitHub(tag, project.getIdentifier())
-                  .build();
-
+                final Release newRelease = mapToRelease(tag, project.getIdentifier());
                 releases.saveAndFlush(newRelease);
-
                 newReleases.add(newRelease);
               }
             });
@@ -240,16 +182,16 @@ public class GitHubHostService extends AbstractHealthIndicator implements HostSe
             newReleases.forEach(project::addRelease);
             projectService.persist(project);
           } catch (IOException e) {
-            logger.warn(prefix + "Got exception while fetching tags", e);
+            log.warn(prefix + "Got exception while fetching tags", e);
           }
         });
       }
 
     } catch (FileNotFoundException e) {
-      logger.warn(prefix + "Project does not exist. Removed or bad access rights?");
+      log.warn(prefix + "Project does not exist. Removed or bad access rights?");
     }
 
-    logger.debug(prefix + "Found {} new releases", newReleases.size());
+    log.debug(prefix + "Found {} new releases", newReleases.size());
     return newReleases;
   }
 
@@ -258,29 +200,49 @@ public class GitHubHostService extends AbstractHealthIndicator implements HostSe
     return "github";
   }
 
+
+  /**
+   * Convenience method to convert a {@link GHTag} to a {@link Release}.
+   */
+  private Release mapToRelease(GHTag tag, String identifier) {
+    Date creationDate;
+
+    try {
+      creationDate = tag.getCommit().getAuthoredDate();
+    } catch (IOException e) {
+      creationDate = new Date(0);
+    }
+
+    return Release.builder()
+      .withVersion(tag.getName())
+      .withUrl("https://github.com/" + identifier + "/releases/tag/" + tag.getName())
+      .withCreatedAt(creationDate)
+      .build();
+  }
+
   /**
    * Utility method to check if the rate limit is reached and log a bunch in the process.
    */
   private boolean hasReachedRateLimit() {
     // Check rate limit
-    Optional<GHRateLimit> rl = getRateLimit();
+    Optional<GHRateLimit> rateLimit = getRateLimit();
 
-    if (rl.isPresent()) {
-      GHRateLimit rateLimit = rl.get();
+    if (rateLimit.isPresent()) {
+      GHRateLimit rl = rateLimit.get();
 
-      logger.debug("{}/{} calls performed", rateLimit.remaining, rateLimit.limit);
-      logger.debug("Rate limit will be reset on {}", rateLimit.getResetDate());
+      log.debug("{} of {} available calls performed", rl.remaining, rl.limit);
+      log.debug("Rate limit will be reset on {}", rl.getResetDate());
 
-      int callsLeft = rateLimit.limit - (rateLimit.remaining - rateLimitBuffer);
+      int callsLeft = rl.limit - (rl.remaining - props.getGithub().getRatelimitBuffer());
 
       if (callsLeft <= 0) {
-        logger.info("No GitHub calls remaining. No new release checks will be "
-          + "attempted before {} has occurred", rateLimit.remaining, rateLimit.getResetDate());
+        log.info("No GitHub calls remaining. No new release checks will be "
+            + "attempted before {} has occurred", rl.remaining, rl.getResetDate());
 
         return true;
       }
     } else {
-      logger.warn("Could not get rate limit information! Cancelling future calls");
+      log.warn("Could not get rate limit information! Assuming rate limit has been reached.");
       return true;
     }
 
@@ -298,14 +260,11 @@ public class GitHubHostService extends AbstractHealthIndicator implements HostSe
     List<Release> releases = new ArrayList<>();
 
     try {
-      Release.ReleaseBuilder mapper = ReleaseBuilder.builder();
-
-      releases = repository.listTags().asList()
-        .stream()
-        .map(tag -> mapper.fromGitHub(tag, identifier).build())
+      releases = repository.listTags().asList().stream()
+        .map(tag -> mapToRelease(tag, identifier))
         .collect(Collectors.toList());
     } catch (IOException e) {
-      logger.warn("Encountered IOException while populating GitHub releases", e);
+      log.warn("Encountered IOException while populating GitHub releases", e);
     }
 
     return releases;
@@ -317,7 +276,7 @@ public class GitHubHostService extends AbstractHealthIndicator implements HostSe
   @Override
   protected void doHealthCheck(Health.Builder builder) throws Exception {
     getRateLimit().ifPresent(rateLimit -> {
-      builder.withDetail("buffer", rateLimitBuffer);
+      builder.withDetail("buffer", props.getGithub().getRatelimitBuffer());
       builder.withDetail("limit", rateLimit.limit);
       builder.withDetail("remaining", rateLimit.remaining);
       builder.withDetail("resetDate", rateLimit.getResetDate());
@@ -328,5 +287,53 @@ public class GitHubHostService extends AbstractHealthIndicator implements HostSe
     } else {
       builder.up();
     }
+  }
+
+
+  /**
+   * Constructs a <code>GHRepository</code> with populated data for a given identifier.
+   *
+   * @param ownerRepo A username and project in this form: <code>apple/swift</code> for describing
+   *                  the repository located at https://github.com/apple/swift.
+   * @return A populated <code>GHRepository</code> object with data about the requested repository.
+   * @throws IllegalArgumentException Thrown if a malformed project identifier is provided as the
+   *                                  input argument.
+   * @throws FileNotFoundException    Thrown if the repository does not exist.
+   */
+  private Optional<GHRepository> getRepository(final String ownerRepo)
+      throws IllegalArgumentException, FileNotFoundException {
+    log.debug("Processing repository with identifier: {}", ownerRepo);
+
+    if (ownerRepo == null || ownerRepo.isEmpty()) {
+      throw new IllegalArgumentException("GitHub repository identifier is missing");
+    } else if (!validIdentifier(ownerRepo)) {
+      throw new IllegalArgumentException("Illegal GitHub repository identifier: " + ownerRepo);
+    }
+
+    try {
+      return Optional.ofNullable(gitHub.getRepository(ownerRepo));
+    } catch (FileNotFoundException e) {
+      log.info("GitHub repository does not exist: {}", ownerRepo);
+      throw e;
+    } catch (IOException e) {
+      log.warn("Got exception while fetching repository", e);
+    }
+
+    return Optional.empty();
+  }
+
+  /**
+   * Gets information about the remaining rate limit.
+   *
+   * @return A optional <code>GHRateLimit</code> object.
+   */
+  private Optional<GHRateLimit> getRateLimit() {
+    try {
+      return Optional.ofNullable(gitHub.getRateLimit());
+    } catch (IOException e) {
+      log.warn("Got exception while requesting rate limit", e);
+    }
+
+    return Optional.empty();
   }
 }

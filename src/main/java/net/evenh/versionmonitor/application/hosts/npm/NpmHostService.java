@@ -1,7 +1,5 @@
 package net.evenh.versionmonitor.application.hosts.npm;
 
-import static net.evenh.versionmonitor.domain.releases.Release.ReleaseBuilder.builder;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -129,11 +127,19 @@ public class NpmHostService implements HostService, InitializingBean {
     npm.getReleases().forEach((key, value) -> {
       value.setReleased(npm.getTime().get(key));
 
-      releases.add(builder().fromNpm(value, identifier).build());
+      releases.add(mapToRelease(value, identifier));
     });
 
     project.setReleases(releases);
 
     return project;
+  }
+
+  private Release mapToRelease(NpmReleaseRepresentation release, String identifier) {
+    return Release.builder()
+      .withVersion(release.getVersion())
+      .withUrl("https://www.npmjs.com/package/" + identifier)
+      .withCreatedAt(release.getReleased())
+      .build();
   }
 }
