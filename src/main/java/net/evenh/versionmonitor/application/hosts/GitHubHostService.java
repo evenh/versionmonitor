@@ -102,7 +102,7 @@ public class GitHubHostService extends AbstractHealthIndicator implements HostSe
     // Register GitHubHostService with the host registry
     registry.register(this);
 
-    logger.info("GitHub service up and running");
+    logger.info("GitHub service up and running. Logged in as: {}", gitHub.getMyself().getLogin());
   }
 
 
