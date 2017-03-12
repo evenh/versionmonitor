@@ -34,18 +34,11 @@
   </prerequisites>
 
   <properties>
-    <commons-io.version>2.5</commons-io.version>
-    <commons-lang.version>2.6</commons-lang.version>
-    <java.version>1.8</java.version>
-    <maven.compiler.source>${java.version}</maven.compiler.source>
-    <maven.compiler.target>${java.version}</maven.compiler.target>
-    <metrics-spark-reporter.version>1.2</metrics-spark-reporter.version>
-    <metrics-spring.version>3.1.3</metrics-spring.version>
-    <logstash-logback-encoder.version>4.6</logstash-logback-encoder.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
     <run.addResources>false</run.addResources>
     <okhttp.version>2.7.5</okhttp.version>
     <jacoco.version>0.7.7.201606060606</jacoco.version>
-    <dropwizard-metrics.version>3.1.2</dropwizard-metrics.version>
   </properties>
 
   <dependencies>
@@ -79,70 +72,6 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>21.0</version>
-    </dependency>
-
-    <!-- Metrics -->
-    <dependency>
-      <groupId>io.dropwizard.metrics</groupId>
-      <artifactId>metrics-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.dropwizard.metrics</groupId>
-      <artifactId>metrics-annotation</artifactId>
-      <version>${dropwizard-metrics.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.dropwizard.metrics</groupId>
-      <artifactId>metrics-graphite</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.dropwizard.metrics</groupId>
-      <artifactId>metrics-healthchecks</artifactId>
-      <version>${dropwizard-metrics.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.dropwizard.metrics</groupId>
-      <artifactId>metrics-json</artifactId>
-      <version>${dropwizard-metrics.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.dropwizard.metrics</groupId>
-      <artifactId>metrics-jvm</artifactId>
-      <version>${dropwizard-metrics.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.dropwizard.metrics</groupId>
-      <artifactId>metrics-servlet</artifactId>
-      <version>${dropwizard-metrics.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.dropwizard.metrics</groupId>
-      <artifactId>metrics-servlets</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>metrics-healthchecks</artifactId>
-          <groupId>io.dropwizard.metrics</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>com.ryantenney.metrics</groupId>
-      <artifactId>metrics-spring</artifactId>
-      <version>${metrics-spring.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.codahale.metrics</groupId>
-          <artifactId>metrics-annotation</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.codahale.metrics</groupId>
-          <artifactId>metrics-core</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.codahale.metrics</groupId>
-          <artifactId>metrics-healthchecks</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <!-- Database -->
