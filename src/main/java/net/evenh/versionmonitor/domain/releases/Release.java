@@ -1,19 +1,11 @@
 package net.evenh.versionmonitor.domain.releases;
 
 import com.fasterxml.jackson.annotation.JsonView;
-
-import net.evenh.versionmonitor.domain.View;
-import net.evenh.versionmonitor.domain.projects.npm.NpmReleaseRepresentation;
-
-import org.kohsuke.github.GHRelease;
-import org.kohsuke.github.GHTag;
-
 import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,6 +13,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import net.evenh.versionmonitor.domain.View;
+import net.evenh.versionmonitor.domain.projects.npm.NpmReleaseRepresentation;
+import org.kohsuke.github.GHRelease;
+import org.kohsuke.github.GHTag;
 
 /**
  * Represents a release.
@@ -139,7 +135,7 @@ public class Release {
       this.url = "https://github.com/" + identifier + "/releases/tag/" + this.version;
       this.prerelease = null;
       try {
-        this.createdAt = tag.getCommit().getCommitShortInfo().getCommitter().getDate();
+        this.createdAt = tag.getCommit().getAuthoredDate();
       } catch (IOException e) {
         this.createdAt = new Date(0);
       }
