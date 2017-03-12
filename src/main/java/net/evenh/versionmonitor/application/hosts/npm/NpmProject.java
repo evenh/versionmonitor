@@ -1,17 +1,15 @@
 package net.evenh.versionmonitor.application.hosts.npm;
 
-import net.evenh.versionmonitor.domain.projects.AbstractProject;
-import net.evenh.versionmonitor.domain.projects.Project;
-
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import net.evenh.versionmonitor.domain.projects.Project;
 
 /**
  * Represents a NPM software project.
  */
 @Entity
 @Table(name = "projects_npm")
-public class NpmProject extends AbstractProject implements Project {
+public class NpmProject extends Project {
   public NpmProject() {
   }
 

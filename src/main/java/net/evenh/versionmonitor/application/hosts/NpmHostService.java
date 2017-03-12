@@ -2,7 +2,7 @@ package net.evenh.versionmonitor.application.hosts;
 
 import net.evenh.versionmonitor.domain.hosts.HostRegistry;
 import net.evenh.versionmonitor.domain.hosts.HostService;
-import net.evenh.versionmonitor.domain.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.projects.Project;
 import net.evenh.versionmonitor.domain.projects.ProjectService;
 import net.evenh.versionmonitor.domain.releases.ReleaseRepository;
 import net.evenh.versionmonitor.application.hosts.npm.NpmProject;
@@ -54,7 +54,7 @@ public class NpmHostService implements HostService, InitializingBean {
   }
 
   @Override
-  public boolean satisfiedBy(AbstractProject project) {
+  public boolean satisfiedBy(Project project) {
     return project instanceof NpmProject;
   }
 
@@ -64,7 +64,7 @@ public class NpmHostService implements HostService, InitializingBean {
   }
 
   @Override
-  public Optional<? extends AbstractProject> getProject(String identifier) {
+  public Optional<? extends Project> getProject(String identifier) {
     log.debug("Processing NPM project with identifier: {}", identifier);
     try {
       NpmProjectRepresentation npm = http.getForObject(npmRegistry + "/" + identifier, NpmProjectRepresentation.class);
@@ -76,7 +76,7 @@ public class NpmHostService implements HostService, InitializingBean {
   }
 
   @Override
-  public List<Release> check(AbstractProject project) throws Exception {
+  public List<Release> check(Project project) throws Exception {
     Objects.requireNonNull("Supplied NPM project cannot be null");
 
     if (!satisfiedBy(project)) {
@@ -92,7 +92,7 @@ public class NpmHostService implements HostService, InitializingBean {
       .collect(Collectors.toList());
 
     try {
-      Optional<? extends AbstractProject> remoteProject = getProject(project.getIdentifier());
+      Optional<? extends Project> remoteProject = getProject(project.getIdentifier());
 
       if (!remoteProject.isPresent()) {
         log.warn(prefix + "Could not read project {} from NPM.", project.getIdentifier());

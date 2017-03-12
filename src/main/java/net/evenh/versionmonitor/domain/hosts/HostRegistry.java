@@ -2,7 +2,7 @@ package net.evenh.versionmonitor.domain.hosts;
 
 import java.util.Optional;
 import java.util.Set;
-import net.evenh.versionmonitor.domain.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.projects.Project;
 
 /**
  * A registry of available hosts.
@@ -38,5 +38,5 @@ public interface HostRegistry {
   /**
    * Lookup a given host service implementation for a project.
    */
-  Optional<HostService> forProject(AbstractProject project);
+  Optional<HostService> forProject(Project project);
 }

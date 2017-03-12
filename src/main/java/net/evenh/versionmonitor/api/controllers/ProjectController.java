@@ -11,7 +11,7 @@ import net.evenh.versionmonitor.api.exceptions.SubscriptionNotFoundException;
 import net.evenh.versionmonitor.api.exceptions.UnknownProjectTypeException;
 import net.evenh.versionmonitor.domain.hosts.HostRegistry;
 import net.evenh.versionmonitor.domain.hosts.HostService;
-import net.evenh.versionmonitor.domain.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.projects.Project;
 import net.evenh.versionmonitor.domain.projects.ProjectService;
 import net.evenh.versionmonitor.domain.subscriptions.AbstractSubscription;
 import net.evenh.versionmonitor.application.subscriptions.SubscriptionService;
@@ -61,7 +61,7 @@ public class ProjectController {
   @JsonView(View.Summary.class)
   @RequestMapping(method = RequestMethod.GET)
   public ResponseEntity getAllProjects() {
-    List<AbstractProject> projects = projectService.findAll();
+    List<Project> projects = projectService.findAll();
 
     if (projects.isEmpty()) {
       throw new NoProjectsExistsException();
@@ -89,10 +89,10 @@ public class ProjectController {
         }
 
         HostService hostService = registry.getHostService(hostname).get();
-        Optional<? extends AbstractProject> project = hostService.getProject(command.getIdentifier());
+        Optional<? extends Project> project = hostService.getProject(command.getIdentifier());
 
         if (project.isPresent()) {
-          AbstractProject saved = projectService.persist(project.get());
+          Project saved = projectService.persist(project.get());
           logger.info("Successfully added project: {}", saved);
           return new ResponseEntity<>(saved, HttpStatus.CREATED);
         }
@@ -106,13 +106,13 @@ public class ProjectController {
   /**
    * Gets a single project by primary key.
    *
-   * @param id The primary key of an <code>AbstractProject</code>.
+   * @param id The primary key of an <code>Project</code>.
    * @return The project found by primary key on success, a JSON error response otherwise.
    */
   @JsonView(View.Detail.class)
   @RequestMapping(value = "/{id}", method = RequestMethod.GET)
   public ResponseEntity getOne(@PathVariable Long id) {
-    Optional<AbstractProject> project = projectService.findOne(id);
+    Optional<Project> project = projectService.findOne(id);
 
     if (!project.isPresent()) {
       throw new ProjectNotFoundException();
@@ -130,7 +130,7 @@ public class ProjectController {
   @RequestMapping(value = "/{id}/subscribe/{subscriptionId}", method = RequestMethod.POST)
   public ResponseEntity addSubscriber(@PathVariable Long id, @PathVariable Long subscriptionId) {
     Optional<AbstractSubscription> subscriptionMaybe = subscriptionService.findOne(subscriptionId);
-    Optional<AbstractProject> projectMaybe = projectService.findOne(id);
+    Optional<Project> projectMaybe = projectService.findOne(id);
 
     if (!projectMaybe.isPresent()) {
       throw new ProjectNotFoundException();
@@ -140,13 +140,13 @@ public class ProjectController {
       throw new SubscriptionNotFoundException();
     }
 
-    AbstractProject project = projectMaybe.get();
+    Project project = projectMaybe.get();
 
     if (!project.addSubscription(subscriptionMaybe.get())) {
       throw new SubscriptionAlreadyLinkedToProjectException();
     }
 
-    AbstractProject savedProject = projectService.persist(project);
+    Project savedProject = projectService.persist(project);
 
     logger.info("Successfully added subscription for project {}: {}", savedProject, subscriptionMaybe);
 
@@ -162,7 +162,7 @@ public class ProjectController {
   @RequestMapping(value = "/{id}/unsubscribe/{subscriptionId}", method = RequestMethod.POST)
   public ResponseEntity removeSubscriber(@PathVariable Long id, @PathVariable Long subscriptionId) {
     Optional<AbstractSubscription> subscriptionMaybe = subscriptionService.findOne(subscriptionId);
-    Optional<AbstractProject> projectMaybe = projectService.findOne(id);
+    Optional<Project> projectMaybe = projectService.findOne(id);
 
     if (!projectMaybe.isPresent()) {
       throw new ProjectNotFoundException();
@@ -173,13 +173,13 @@ public class ProjectController {
     }
 
 
-    AbstractProject project = projectMaybe.get();
+    Project project = projectMaybe.get();
 
     if (!project.removeSubscription(subscriptionMaybe.get())) {
       throw new SubscriptionNotFoundException();
     }
 
-    AbstractProject savedProject = projectService.persist(project);
+    Project savedProject = projectService.persist(project);
 
     logger.info("Successfully removed subscription for project {}: {}", savedProject, subscriptionMaybe);
 
@@ -189,12 +189,12 @@ public class ProjectController {
   /**
    * Deletes a project by primary key.
    *
-   * @param id The primary key of an <code>AbstractProject</code>.
+   * @param id The primary key of an <code>Project</code>.
    * @return HTTP 204 on success, error message otherwise.
    */
   @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
   public ResponseEntity deleteOne(@PathVariable Long id) {
-    Optional<AbstractProject> project = projectService.findOne(id);
+    Optional<Project> project = projectService.findOne(id);
 
     if (!project.isPresent()) {
       throw new ProjectNotFoundException();

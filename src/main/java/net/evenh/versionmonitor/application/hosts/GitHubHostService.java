@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.evenh.versionmonitor.domain.hosts.HostRegistry;
 import net.evenh.versionmonitor.domain.hosts.HostService;
-import net.evenh.versionmonitor.domain.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.projects.Project;
 import net.evenh.versionmonitor.domain.projects.ProjectService;
 import net.evenh.versionmonitor.application.hosts.github.GitHubProject;
 import net.evenh.versionmonitor.domain.releases.Release;
@@ -192,12 +192,12 @@ public class GitHubHostService extends AbstractHealthIndicator implements HostSe
   }
 
   @Override
-  public boolean satisfiedBy(AbstractProject project) {
+  public boolean satisfiedBy(Project project) {
     return (project instanceof GitHubProject);
   }
 
   @Override
-  public List<Release> check(final AbstractProject project) throws Exception {
+  public List<Release> check(final Project project) throws Exception {
     Objects.requireNonNull("Supplied GitHub project cannot be null");
 
     if (!satisfiedBy(project)) {

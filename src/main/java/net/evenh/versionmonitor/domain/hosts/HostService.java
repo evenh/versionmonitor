@@ -2,7 +2,7 @@ package net.evenh.versionmonitor.domain.hosts;
 
 import java.util.List;
 import java.util.Optional;
-import net.evenh.versionmonitor.domain.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.projects.Project;
 import net.evenh.versionmonitor.domain.releases.Release;
 
 /**
@@ -23,10 +23,10 @@ public interface HostService {
   /**
    * Checks whether a project is instance of an acceptable subtype.
    *
-   * @param project A {@link AbstractProject} subclass.
+   * @param project A {@link Project} subclass.
    * @return True if the given host can process the given project.
    */
-  boolean satisfiedBy(final AbstractProject project);
+  boolean satisfiedBy(final Project project);
 
   /**
    * An identifier that is unique across the system.
@@ -40,12 +40,12 @@ public interface HostService {
    *
    * @param identifier The unique identifier that identifies a project with this host.
    */
-  Optional<? extends AbstractProject> getProject(final String identifier);
+  Optional<? extends Project> getProject(final String identifier);
 
   /**
    * Checks for new releases and updates the database if new releases is found.
    *
    * @return The new releases found.
    */
-  List<Release> check(final AbstractProject project) throws Exception;
+  List<Release> check(final Project project) throws Exception;
 }

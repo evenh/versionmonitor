@@ -2,7 +2,7 @@ package net.evenh.versionmonitor.application.notifications;
 
 import java.util.Optional;
 import net.evenh.versionmonitor.domain.notifications.NotificationService;
-import net.evenh.versionmonitor.domain.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.projects.Project;
 import net.evenh.versionmonitor.domain.projects.ProjectService;
 import net.evenh.versionmonitor.domain.subscriptions.AbstractSubscription;
 import net.evenh.versionmonitor.domain.releases.Release;
@@ -77,10 +77,10 @@ public class SlackNotificationService implements NotificationService, Initializi
    * @return A properly constructed <code>SlackMessage</code> object.
    */
   private Optional<SlackMessage> constructMessage(Release release) {
-    Optional<AbstractProject> projectMaybe = service.findByRelease(release);
+    Optional<Project> projectMaybe = service.findByRelease(release);
 
     if (projectMaybe.isPresent()) {
-      AbstractProject project = projectMaybe.get();
+      Project project = projectMaybe.get();
 
       String rawText = "Version <"
               + release.getUrl()

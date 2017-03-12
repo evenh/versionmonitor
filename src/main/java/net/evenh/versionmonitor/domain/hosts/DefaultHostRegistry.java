@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import net.evenh.versionmonitor.domain.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.projects.Project;
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.stereotype.Component;
@@ -49,7 +49,7 @@ public class DefaultHostRegistry extends AbstractHealthIndicator implements Host
     return registry.containsKey(hostIdentifier);
   }
 
-  public Optional<HostService> forProject(AbstractProject project) {
+  public Optional<HostService> forProject(Project project) {
     for (HostService host : registry.values()) {
       if (host.satisfiedBy(project)) {
         return Optional.of(host);

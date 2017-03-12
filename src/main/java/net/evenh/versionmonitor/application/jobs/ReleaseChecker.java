@@ -1,22 +1,19 @@
 package net.evenh.versionmonitor.application.jobs;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.evenh.versionmonitor.application.notifications.SlackNotificationService;
 import net.evenh.versionmonitor.domain.hosts.HostRegistry;
-import net.evenh.versionmonitor.domain.projects.AbstractProject;
 import net.evenh.versionmonitor.domain.projects.Project;
 import net.evenh.versionmonitor.domain.projects.ProjectService;
-import net.evenh.versionmonitor.application.notifications.SlackNotificationService;
 import net.evenh.versionmonitor.domain.releases.Release;
 import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Schedules and delegates the checking for new releases.
@@ -45,7 +42,7 @@ public class ReleaseChecker {
    */
   @Scheduled(cron = "${versionmonitor.jobchecker.cron}")
   public void check() {
-    List<AbstractProject> projects = service.findAll();
+    List<Project> projects = service.findAll();
 
     if (projects.isEmpty()) {
       logger.info("No projects found, skipping checks");
