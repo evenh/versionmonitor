@@ -6,10 +6,10 @@ import net.evenh.versionmonitor.api.commands.AddSubscriptionCommand;
 import net.evenh.versionmonitor.api.exceptions.NoSubscriptionsExistsException;
 import net.evenh.versionmonitor.api.exceptions.SubscriptionNotFoundException;
 import net.evenh.versionmonitor.api.exceptions.UnknownSubscriptionServiceException;
-import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
+import net.evenh.versionmonitor.domain.subscriptions.AbstractSubscription;
 import net.evenh.versionmonitor.application.subscriptions.SubscriptionService;
-import net.evenh.versionmonitor.domain.View;
-import net.evenh.versionmonitor.domain.subscriptions.SlackSubscription;
+import net.evenh.versionmonitor.infrastructure.View;
+import net.evenh.versionmonitor.application.subscriptions.SlackSubscription;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

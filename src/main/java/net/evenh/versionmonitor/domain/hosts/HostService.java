@@ -1,10 +1,9 @@
-package net.evenh.versionmonitor.application.hosts;
-
-import net.evenh.versionmonitor.domain.releases.Release;
-import net.evenh.versionmonitor.application.projects.AbstractProject;
+package net.evenh.versionmonitor.domain.hosts;
 
 import java.util.List;
 import java.util.Optional;
+import net.evenh.versionmonitor.domain.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.releases.Release;
 
 /**
  * Host protocol.

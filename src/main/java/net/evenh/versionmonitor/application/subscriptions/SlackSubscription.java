@@ -1,14 +1,12 @@
-package net.evenh.versionmonitor.domain.subscriptions;
+package net.evenh.versionmonitor.application.subscriptions;
 
 import com.fasterxml.jackson.annotation.JsonView;
-
-import net.evenh.versionmonitor.api.commands.AddSubscriptionCommand;
-import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
-import net.evenh.versionmonitor.domain.View;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import net.evenh.versionmonitor.api.commands.AddSubscriptionCommand;
+import net.evenh.versionmonitor.domain.subscriptions.AbstractSubscription;
+import net.evenh.versionmonitor.infrastructure.View;
 
 /**
  * A subscription of new release notifications.

@@ -1,7 +1,7 @@
-package net.evenh.versionmonitor.domain.projects.npm;
+package net.evenh.versionmonitor.application.hosts.npm;
 
-import net.evenh.versionmonitor.application.projects.AbstractProject;
-import net.evenh.versionmonitor.application.projects.Project;
+import net.evenh.versionmonitor.domain.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.projects.Project;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;

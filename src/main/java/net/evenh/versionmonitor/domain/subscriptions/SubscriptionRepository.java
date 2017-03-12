@@ -1,4 +1,4 @@
-package net.evenh.versionmonitor.application.subscriptions;
+package net.evenh.versionmonitor.domain.subscriptions;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

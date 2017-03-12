@@ -1,12 +1,12 @@
-package net.evenh.versionmonitor.application.hosts.impl;
+package net.evenh.versionmonitor.application.hosts;
 
-import net.evenh.versionmonitor.application.hosts.HostRegistry;
-import net.evenh.versionmonitor.application.hosts.HostService;
-import net.evenh.versionmonitor.application.projects.AbstractProject;
-import net.evenh.versionmonitor.application.projects.ProjectService;
-import net.evenh.versionmonitor.application.releases.ReleaseRepository;
-import net.evenh.versionmonitor.domain.projects.npm.NpmProject;
-import net.evenh.versionmonitor.domain.projects.npm.NpmProjectRepresentation;
+import net.evenh.versionmonitor.domain.hosts.HostRegistry;
+import net.evenh.versionmonitor.domain.hosts.HostService;
+import net.evenh.versionmonitor.domain.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.projects.ProjectService;
+import net.evenh.versionmonitor.domain.releases.ReleaseRepository;
+import net.evenh.versionmonitor.application.hosts.npm.NpmProject;
+import net.evenh.versionmonitor.application.hosts.npm.NpmProjectRepresentation;
 import net.evenh.versionmonitor.domain.releases.Release;
 
 import org.slf4j.Logger;

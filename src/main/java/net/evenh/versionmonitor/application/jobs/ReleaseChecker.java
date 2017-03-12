@@ -1,10 +1,10 @@
 package net.evenh.versionmonitor.application.jobs;
 
-import net.evenh.versionmonitor.application.hosts.HostRegistry;
-import net.evenh.versionmonitor.application.projects.AbstractProject;
-import net.evenh.versionmonitor.application.projects.Project;
-import net.evenh.versionmonitor.application.projects.ProjectService;
-import net.evenh.versionmonitor.domain.notifications.SlackNotificationService;
+import net.evenh.versionmonitor.domain.hosts.HostRegistry;
+import net.evenh.versionmonitor.domain.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.projects.Project;
+import net.evenh.versionmonitor.domain.projects.ProjectService;
+import net.evenh.versionmonitor.application.notifications.SlackNotificationService;
 import net.evenh.versionmonitor.domain.releases.Release;
 import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
 

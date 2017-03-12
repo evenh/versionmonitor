@@ -1,22 +1,20 @@
-package net.evenh.versionmonitor.domain.notifications;
+package net.evenh.versionmonitor.application.notifications;
 
-import net.evenh.versionmonitor.application.notifications.NotificationService;
-import net.evenh.versionmonitor.application.projects.AbstractProject;
-import net.evenh.versionmonitor.application.projects.ProjectService;
-import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
+import java.util.Optional;
+import net.evenh.versionmonitor.domain.notifications.NotificationService;
+import net.evenh.versionmonitor.domain.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.projects.ProjectService;
+import net.evenh.versionmonitor.domain.subscriptions.AbstractSubscription;
 import net.evenh.versionmonitor.domain.releases.Release;
-import net.evenh.versionmonitor.domain.subscriptions.SlackSubscription;
+import net.evenh.versionmonitor.application.subscriptions.SlackSubscription;
 import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
 import net.gpedro.integrations.slack.SlackApi;
 import net.gpedro.integrations.slack.SlackMessage;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 /**
  * Handles notification of new releases via Slack.

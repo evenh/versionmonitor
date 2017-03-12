@@ -1,4 +1,4 @@
-package net.evenh.versionmonitor.domain.projects.npm;
+package net.evenh.versionmonitor.application.hosts.npm;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

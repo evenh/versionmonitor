@@ -13,8 +13,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import net.evenh.versionmonitor.domain.View;
-import net.evenh.versionmonitor.domain.projects.npm.NpmReleaseRepresentation;
+import net.evenh.versionmonitor.infrastructure.View;
+import net.evenh.versionmonitor.application.hosts.npm.NpmReleaseRepresentation;
 import org.kohsuke.github.GHRelease;
 import org.kohsuke.github.GHTag;
 

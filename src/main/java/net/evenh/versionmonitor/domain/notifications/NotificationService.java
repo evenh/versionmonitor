@@ -1,6 +1,6 @@
-package net.evenh.versionmonitor.application.notifications;
+package net.evenh.versionmonitor.domain.notifications;
 
-import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
+import net.evenh.versionmonitor.domain.subscriptions.AbstractSubscription;
 import net.evenh.versionmonitor.domain.releases.Release;
 
 /**

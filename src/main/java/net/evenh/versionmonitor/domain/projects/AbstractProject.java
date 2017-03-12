@@ -1,9 +1,9 @@
-package net.evenh.versionmonitor.application.projects;
+package net.evenh.versionmonitor.domain.projects;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
-import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
-import net.evenh.versionmonitor.domain.View;
+import net.evenh.versionmonitor.domain.subscriptions.AbstractSubscription;
+import net.evenh.versionmonitor.infrastructure.View;
 import net.evenh.versionmonitor.domain.releases.Release;
 
 import org.slf4j.Logger;

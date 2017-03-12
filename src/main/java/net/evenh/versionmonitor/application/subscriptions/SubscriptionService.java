@@ -1,15 +1,20 @@
 package net.evenh.versionmonitor.application.subscriptions;
 
+import java.util.List;
+import java.util.Optional;
+import net.evenh.versionmonitor.domain.subscriptions.AbstractSubscription;
+import net.evenh.versionmonitor.domain.subscriptions.SubscriptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class SubscriptionService {
+  private final SubscriptionRepository repository;
+
   @Autowired
-  private SubscriptionRepository repository;
+  public SubscriptionService(SubscriptionRepository repository) {
+    this.repository = repository;
+  }
 
 
   /**

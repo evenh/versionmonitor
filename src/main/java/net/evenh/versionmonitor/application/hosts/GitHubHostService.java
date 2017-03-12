@@ -1,17 +1,25 @@
-package net.evenh.versionmonitor.application.hosts.impl;
+package net.evenh.versionmonitor.application.hosts;
+
+import static net.evenh.versionmonitor.domain.releases.Release.ReleaseBuilder;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
-
-import net.evenh.versionmonitor.application.hosts.HostRegistry;
-import net.evenh.versionmonitor.application.hosts.HostService;
-import net.evenh.versionmonitor.application.projects.AbstractProject;
-import net.evenh.versionmonitor.application.projects.ProjectService;
-import net.evenh.versionmonitor.application.releases.ReleaseRepository;
-import net.evenh.versionmonitor.domain.projects.github.GitHubProject;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import net.evenh.versionmonitor.domain.hosts.HostRegistry;
+import net.evenh.versionmonitor.domain.hosts.HostService;
+import net.evenh.versionmonitor.domain.projects.AbstractProject;
+import net.evenh.versionmonitor.domain.projects.ProjectService;
+import net.evenh.versionmonitor.application.hosts.github.GitHubProject;
 import net.evenh.versionmonitor.domain.releases.Release;
+import net.evenh.versionmonitor.domain.releases.ReleaseRepository;
 import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
-
 import org.kohsuke.github.GHRateLimit;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
@@ -24,17 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.stereotype.Service;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import static net.evenh.versionmonitor.domain.releases.Release.ReleaseBuilder;
 
 /**
  * GitHub service is responsible for communicating with GitHub, including monitoring rate limits.

@@ -1,4 +1,4 @@
-package net.evenh.versionmonitor.domain;
+package net.evenh.versionmonitor.infrastructure;
 
 /**
  * Controls JSON serialization detail level.

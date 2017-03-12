@@ -1,12 +1,10 @@
-package net.evenh.versionmonitor.application.projects;
-
-import net.evenh.versionmonitor.domain.releases.Release;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+package net.evenh.versionmonitor.domain.projects;
 
 import java.util.List;
 import java.util.Optional;
+import net.evenh.versionmonitor.domain.releases.Release;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ProjectService {

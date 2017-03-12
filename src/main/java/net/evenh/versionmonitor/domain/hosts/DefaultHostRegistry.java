@@ -1,23 +1,16 @@
-package net.evenh.versionmonitor.application.hosts.impl;
-
-import net.evenh.versionmonitor.application.hosts.HostRegistry;
-import net.evenh.versionmonitor.application.hosts.HostService;
-import net.evenh.versionmonitor.application.projects.AbstractProject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.actuate.health.AbstractHealthIndicator;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.stereotype.Component;
+package net.evenh.versionmonitor.domain.hosts;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import net.evenh.versionmonitor.domain.projects.AbstractProject;
+import org.springframework.boot.actuate.health.AbstractHealthIndicator;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.stereotype.Component;
 
 @Component
 public class DefaultHostRegistry extends AbstractHealthIndicator implements HostRegistry {
-  private static final Logger logger = LoggerFactory.getLogger(HostRegistry.class);
   private final Map<String, HostService> registry = new HashMap<>();
 
   private DefaultHostRegistry() {
@@ -65,7 +58,6 @@ public class DefaultHostRegistry extends AbstractHealthIndicator implements Host
 
     return Optional.empty();
   }
-
 
   @Override
   protected void doHealthCheck(Health.Builder builder) throws Exception {
