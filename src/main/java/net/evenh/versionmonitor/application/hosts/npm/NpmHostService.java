@@ -1,14 +1,18 @@
-package net.evenh.versionmonitor.application.hosts;
+package net.evenh.versionmonitor.application.hosts.npm;
 
+import static net.evenh.versionmonitor.domain.releases.Release.ReleaseBuilder.builder;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import net.evenh.versionmonitor.domain.hosts.HostRegistry;
 import net.evenh.versionmonitor.domain.hosts.HostService;
 import net.evenh.versionmonitor.domain.projects.Project;
 import net.evenh.versionmonitor.domain.projects.ProjectService;
-import net.evenh.versionmonitor.domain.releases.ReleaseRepository;
-import net.evenh.versionmonitor.application.hosts.npm.NpmProject;
-import net.evenh.versionmonitor.application.hosts.npm.NpmProjectRepresentation;
 import net.evenh.versionmonitor.domain.releases.Release;
-
+import net.evenh.versionmonitor.domain.releases.ReleaseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -16,14 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static net.evenh.versionmonitor.domain.releases.Release.ReleaseBuilder.builder;
 
 @Service("npmHostService")
 public class NpmHostService implements HostService, InitializingBean {

@@ -1,4 +1,4 @@
-package net.evenh.versionmonitor.application.hosts;
+package net.evenh.versionmonitor.application.hosts.github;
 
 import static net.evenh.versionmonitor.domain.releases.Release.ReleaseBuilder;
 
@@ -16,7 +16,6 @@ import net.evenh.versionmonitor.domain.hosts.HostRegistry;
 import net.evenh.versionmonitor.domain.hosts.HostService;
 import net.evenh.versionmonitor.domain.projects.Project;
 import net.evenh.versionmonitor.domain.projects.ProjectService;
-import net.evenh.versionmonitor.application.hosts.github.GitHubProject;
 import net.evenh.versionmonitor.domain.releases.Release;
 import net.evenh.versionmonitor.domain.releases.ReleaseRepository;
 import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
