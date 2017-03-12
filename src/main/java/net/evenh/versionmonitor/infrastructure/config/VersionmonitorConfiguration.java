@@ -1,10 +1,9 @@
 package net.evenh.versionmonitor.infrastructure.config;
 
+import javax.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * Properties specific to Versionmonitor.
@@ -17,9 +16,6 @@ public class VersionmonitorConfiguration {
   private final Async async = new Async();
   private final Http http = new Http();
   private final Cache cache = new Cache();
-  private final Mail mail = new Mail();
-  private final Security security = new Security();
-  private final Metrics metrics = new Metrics();
   private final CorsConfiguration cors = new CorsConfiguration();
   private final Slack slack = new Slack();
   private final Github github = new Github();
@@ -35,18 +31,6 @@ public class VersionmonitorConfiguration {
 
   public Cache getCache() {
     return cache;
-  }
-
-  public Mail getMail() {
-    return mail;
-  }
-
-  public Security getSecurity() {
-    return security;
-  }
-
-  public Metrics getMetrics() {
-    return metrics;
   }
 
   public CorsConfiguration getCors() {
@@ -143,173 +127,8 @@ public class VersionmonitorConfiguration {
     }
   }
 
-  public static class Mail {
-
-    private String from = "versionmonitor@localhost";
-
-    public String getFrom() {
-      return from;
-    }
-
-    public void setFrom(String from) {
-      this.from = from;
-    }
-  }
-
-  public static class Security {
-
-    private final Authentication authentication = new Authentication();
-
-    public Authentication getAuthentication() {
-      return authentication;
-    }
-
-    public static class Authentication {
-
-      private final Jwt jwt = new Jwt();
-
-      public Jwt getJwt() {
-        return jwt;
-      }
-
-      public static class Jwt {
-
-        private String secret;
-
-        private long tokenValidityInSeconds = 1800;
-        private long tokenValidityInSecondsForRememberMe = 2592000;
-
-        public String getSecret() {
-          return secret;
-        }
-
-        public void setSecret(String secret) {
-          this.secret = secret;
-        }
-
-        public long getTokenValidityInSeconds() {
-          return tokenValidityInSeconds;
-        }
-
-        public void setTokenValidityInSeconds(long tokenValidityInSeconds) {
-          this.tokenValidityInSeconds = tokenValidityInSeconds;
-        }
-
-        public long getTokenValidityInSecondsForRememberMe() {
-          return tokenValidityInSecondsForRememberMe;
-        }
-
-        public void setTokenValidityInSecondsForRememberMe(long tokenValidityInSecondsForRememberMe) {
-          this.tokenValidityInSecondsForRememberMe = tokenValidityInSecondsForRememberMe;
-        }
-      }
-    }
-  }
-
-  public static class Metrics {
-
-    private final Jmx jmx = new Jmx();
-
-    private final Graphite graphite = new Graphite();
-
-    private final Logs logs = new Logs();
-
-    public Jmx getJmx() {
-      return jmx;
-    }
-
-    public Graphite getGraphite() {
-      return graphite;
-    }
-
-    public Logs getLogs() {
-      return logs;
-    }
-
-
-    public static class Jmx {
-
-      private boolean enabled = true;
-
-      public boolean isEnabled() {
-        return enabled;
-      }
-
-      public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-      }
-    }
-
-    public static class Graphite {
-
-      private boolean enabled = false;
-
-      private String host = "localhost";
-
-      private int port = 2003;
-
-      private String prefix = "versionmonitor";
-
-      public boolean isEnabled() {
-        return enabled;
-      }
-
-      public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-      }
-
-      public String getHost() {
-        return host;
-      }
-
-      public void setHost(String host) {
-        this.host = host;
-      }
-
-      public int getPort() {
-        return port;
-      }
-
-      public void setPort(int port) {
-        this.port = port;
-      }
-
-      public String getPrefix() {
-        return prefix;
-      }
-
-      public void setPrefix(String prefix) {
-        this.prefix = prefix;
-      }
-    }
-
-    public static class Logs {
-
-      private boolean enabled = false;
-
-      private long reportFrequency = 60;
-
-      public long getReportFrequency() {
-        return reportFrequency;
-      }
-
-      public void setReportFrequency(int reportFrequency) {
-        this.reportFrequency = reportFrequency;
-      }
-
-      public boolean isEnabled() {
-        return enabled;
-      }
-
-      public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-      }
-    }
-  }
-
   public static class Slack {
     private String botname = "VersionMonitor";
-    private String webhookUrl;
 
     public String getBotname() {
       return botname;
@@ -317,14 +136,6 @@ public class VersionmonitorConfiguration {
 
     public void setBotname(String botname) {
       this.botname = botname;
-    }
-
-    public String getWebhookUrl() {
-      return webhookUrl;
-    }
-
-    public void setWebhookUrl(String webhookUrl) {
-      this.webhookUrl = webhookUrl;
     }
   }
 
