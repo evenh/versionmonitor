@@ -1,8 +1,8 @@
-package net.evenh.versionmonitor.application.notifications;
+package net.evenh.versionmonitor.application.notifications.provider;
 
 import java.util.Optional;
 import net.evenh.versionmonitor.application.subscriptions.types.SlackSubscription;
-import net.evenh.versionmonitor.domain.notifications.NotificationService;
+import net.evenh.versionmonitor.domain.notifications.NotificationProvider;
 import net.evenh.versionmonitor.domain.projects.Project;
 import net.evenh.versionmonitor.domain.projects.ProjectService;
 import net.evenh.versionmonitor.domain.releases.Release;
@@ -22,8 +22,8 @@ import org.springframework.stereotype.Component;
  * @since 2016-02-03
  */
 @Component
-public class SlackNotificationService implements NotificationService {
-  private static final Logger logger = LoggerFactory.getLogger(SlackNotificationService.class);
+public class SlackNotificationProvider implements NotificationProvider {
+  private static final Logger logger = LoggerFactory.getLogger(SlackNotificationProvider.class);
 
   @Autowired
   private VersionmonitorConfiguration props;
@@ -59,6 +59,11 @@ public class SlackNotificationService implements NotificationService {
     }
 
     return true;
+  }
+
+  @Override
+  public boolean isSatisfiedBy(Subscription providerSubscription) {
+    return providerSubscription.getClass().isAssignableFrom(SlackSubscription.class);
   }
 
   /**

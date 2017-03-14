@@ -1,14 +1,13 @@
 package net.evenh.versionmonitor.domain.notifications;
 
-import net.evenh.versionmonitor.domain.subscriptions.Subscription;
 import net.evenh.versionmonitor.domain.releases.Release;
 
 /**
- * An interface for notifying subscribers of new releases.
- *
- * @author Even Holthe
- * @since 2016-02-03
+ * A service that can publish information on new {@link Release}s through various providers.
  */
 public interface NotificationService {
-  boolean sendNotification(Release release, Subscription subscription);
+  /**
+   * Notify users through the supported providers of a new release.
+   */
+  void notify(Release release);
 }

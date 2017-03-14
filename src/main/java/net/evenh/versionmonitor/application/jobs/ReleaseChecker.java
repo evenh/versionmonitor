@@ -1,14 +1,12 @@
 package net.evenh.versionmonitor.application.jobs;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import net.evenh.versionmonitor.application.notifications.SlackNotificationService;
 import net.evenh.versionmonitor.domain.hosts.HostRegistry;
+import net.evenh.versionmonitor.domain.notifications.NotificationService;
 import net.evenh.versionmonitor.domain.projects.Project;
 import net.evenh.versionmonitor.domain.projects.ProjectService;
 import net.evenh.versionmonitor.domain.releases.Release;
-import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +30,7 @@ public class ReleaseChecker {
   private HostRegistry registry;
 
   @Autowired
-  private SlackNotificationService slack;
-
-  @Autowired
-  private VersionmonitorConfiguration config;
+  private NotificationService notificationService;
 
   /**
    * Performs the actual checking for new releases at a scheduled interval.
@@ -49,22 +44,18 @@ public class ReleaseChecker {
       return;
     }
 
-    final Map<Project, Release> releases = new HashMap<>();
+    final List<Release> releasesFound = new ArrayList<>();
 
     projects.forEach(project -> registry.forProject(project).ifPresent(host -> {
       try {
-        host.check(project).stream().forEach(release -> releases.put(project, release));
+        host.check(project).forEach(releasesFound::add);
       } catch (Exception e) {
         logger.warn("Got exception while checking for updates for {}", project, e);
       }
     }));
 
-    logger.info("Found a total of {} new releases", releases.size());
+    logger.info("Found a total of {} new releases", releasesFound.size());
 
-    releases.forEach((project, release) -> {
-      project.getSubscriptions().forEach(subscription -> {
-        slack.sendNotification(release, subscription);
-      });
-    });
+    releasesFound.forEach(notificationService::notify);
   }
 }
