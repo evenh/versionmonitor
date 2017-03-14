@@ -21,6 +21,7 @@
     <spring-boot.version>1.5.2.RELEASE</spring-boot.version>
     <okhttp.version>2.7.5</okhttp.version>
     <jacoco.version>0.7.7.201606060606</jacoco.version>
+    <docker.image.prefix>evenh</docker.image.prefix>
   </properties>
 
   <dependencies>
@@ -123,15 +124,19 @@
         <artifactId>docker-maven-plugin</artifactId>
         <version>0.4.13</version>
         <configuration>
-          <imageName>versionmonitor</imageName>
+          <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
           <dockerDirectory>src/main/docker</dockerDirectory>
           <resources>
             <resource>
               <targetPath>/</targetPath>
               <directory>${project.build.directory}</directory>
-              <include>${project.build.finalName}.war</include>
+              <include>${project.build.finalName}.jar</include>
             </resource>
           </resources>
+          <imageTags>
+            <imageTag>${project.version}</imageTag>
+            <imageTag>latest</imageTag>
+          </imageTags>
         </configuration>
       </plugin>
       <plugin>
