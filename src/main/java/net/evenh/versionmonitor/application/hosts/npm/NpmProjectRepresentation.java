@@ -51,11 +51,11 @@ public class NpmProjectRepresentation {
 
   @Override
   public String toString() {
-    return "NpmProjectRepresentation{" +
-      "name='" + name + '\'' +
-      ", description='" + description + '\'' +
-      ", releases=" + releases +
-      ", time=" + time +
-      '}';
+    return "NpmProjectRepresentation{"
+      + "name='" + name + '\''
+      + ", description='" + description + '\''
+      + ", releases=" + releases
+      + ", time=" + time
+      + '}';
   }
 }

@@ -70,7 +70,10 @@ public abstract class Project {
   /**
    * List of notification subscribers for this project.
    */
-  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH}, fetch = FetchType.EAGER)
+  @ManyToMany(
+      cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH},
+      fetch = FetchType.EAGER
+      )
   @JsonView(View.Detail.class)
   private Set<Subscription> subscriptions;
 
@@ -129,6 +132,9 @@ public abstract class Project {
     this.subscriptions = subscriptions;
   }
 
+  /**
+   * Add a {@link Subscription} to this project.
+   */
   public boolean addSubscription(Subscription subscription) {
     if (subscriptions.contains(subscription)) {
       log.debug("Subscription does already exist - won't add: {}", subscription);
@@ -140,6 +146,9 @@ public abstract class Project {
     return true;
   }
 
+  /**
+   * Remove a {@link Subscription} from this project.
+   */
   public boolean removeSubscription(Subscription subscription) {
     if (!subscriptions.contains(subscription)) {
       log.debug("Subscription does not exist - won't remove: {}", subscription);

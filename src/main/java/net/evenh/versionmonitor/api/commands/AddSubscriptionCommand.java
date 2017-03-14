@@ -1,8 +1,7 @@
 package net.evenh.versionmonitor.api.commands;
 
-import org.hibernate.validator.constraints.NotEmpty;
-
 import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
 
 public class AddSubscriptionCommand {
   @NotNull
@@ -53,11 +52,11 @@ public class AddSubscriptionCommand {
 
   @Override
   public String toString() {
-    return "AddSubscriptionCommand{" +
-      "service='" + service + '\'' +
-      ", name='" + name + '\'' +
-      ", identifier='" + identifier + '\'' +
-      ", channel='" + channel + '\'' +
-      '}';
+    return "AddSubscriptionCommand{"
+      + "service='" + service + '\''
+      + ", name='" + name + '\''
+      + ", identifier='" + identifier + '\''
+      + ", channel='" + channel + '\''
+      + '}';
   }
 }

@@ -49,6 +49,9 @@ public class DefaultHostRegistry extends AbstractHealthIndicator implements Host
     return registry.containsKey(hostIdentifier);
   }
 
+  /**
+   * Find the correct {@link HostService} to use for a given {@link Project}.
+   */
   public Optional<HostService> forProject(Project project) {
     for (HostService host : registry.values()) {
       if (host.satisfiedBy(project)) {

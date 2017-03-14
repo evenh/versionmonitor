@@ -33,7 +33,7 @@ public class SlackNotificationProvider implements NotificationProvider {
 
   @Override
   public boolean sendNotification(Release release, Subscription subscription) {
-    if(!(subscription instanceof SlackSubscription)) {
+    if (!(subscription instanceof SlackSubscription)) {
       throw new IllegalStateException("Expected an instance of SlackSubscription");
     }
 
@@ -43,15 +43,15 @@ public class SlackNotificationProvider implements NotificationProvider {
       SlackApi api = new SlackApi(slackSubscription.getIdentifier());
 
       constructMessage(release)
-        .ifPresent(message -> {
-          if(slackSubscription.getChannel() != null) {
-            message.setChannel(slackSubscription.getChannel());
-          }
+          .ifPresent(message -> {
+            if (slackSubscription.getChannel() != null) {
+              message.setChannel(slackSubscription.getChannel());
+            }
 
-          api.call(message);
+            api.call(message);
 
-          logger.debug("Successfully notified: {} of a new release. {}", subscription, release);
-        });
+            logger.debug("Successfully notified: {} of a new release. {}", subscription, release);
+          });
     } catch (RuntimeException e) {
       logger.warn("Could not create Slack notification for release: {}", release, e);
 
@@ -80,13 +80,13 @@ public class SlackNotificationProvider implements NotificationProvider {
       Project project = projectMaybe.get();
 
       String rawText = "Version <"
-              + release.getUrl()
-              + "|" + release.getVersion()
-              + "> of <"
-              + project.getProjectUrl()
-              + "|"
-              + project.getName()
-              + "> is available";
+          + release.getUrl()
+          + "|" + release.getVersion()
+          + "> of <"
+          + project.getProjectUrl()
+          + "|"
+          + project.getName()
+          + "> is available";
 
       SlackMessage msg = new SlackMessage(props.getSlack().getBotname(), rawText);
       msg.setIcon(":exclamation:");

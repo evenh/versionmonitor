@@ -15,6 +15,9 @@ public class WebConfiguration {
   @Autowired
   private VersionmonitorConfiguration props;
 
+  /**
+   * Register a CorsFilter bean.
+   */
   @Bean
   public CorsFilter corsFilter() {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

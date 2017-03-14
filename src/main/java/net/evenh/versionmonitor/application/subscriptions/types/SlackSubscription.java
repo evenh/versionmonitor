@@ -17,6 +17,9 @@ public class SlackSubscription extends Subscription {
     super();
   }
 
+  /**
+   * Create a Slack subscription from a subscription command.
+   */
   public SlackSubscription(AddSubscriptionCommand command) {
     this.setIdentifier(command.getIdentifier());
     this.setName(command.getName());
@@ -36,20 +39,26 @@ public class SlackSubscription extends Subscription {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     SlackSubscription that = (SlackSubscription) o;
 
-    return this.getIdentifier().equalsIgnoreCase(that.getIdentifier()) && this.getName().equalsIgnoreCase(that.getName());
+    return this.getIdentifier().equalsIgnoreCase(that.getIdentifier())
+      && this.getName().equalsIgnoreCase(that.getName());
   }
 
   @Override
   public String toString() {
-    return "SlackSubscription{" +
-      "name='" + getName() + '\'' +
-      " identifier='" + getIdentifier() + '\'' +
-      " channel='" + channel + '\'' +
-      '}';
+    return "SlackSubscription{"
+      + "name='" + getName() + '\''
+      + " identifier='" + getIdentifier() + '\''
+      + " channel='" + channel + '\''
+      + '}';
   }
 
   @Override

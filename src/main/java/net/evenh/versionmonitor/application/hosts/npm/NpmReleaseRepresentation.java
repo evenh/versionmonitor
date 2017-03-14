@@ -27,9 +27,9 @@ public class NpmReleaseRepresentation {
 
   @Override
   public String toString() {
-    return "npm-release{" +
-      "version='" + version + '\'' +
-      ", released='" + released + '\'' +
-      '}';
+    return "npm-release{"
+      + "version='" + version + '\''
+      + ", released='" + released + '\''
+      + '}';
   }
 }

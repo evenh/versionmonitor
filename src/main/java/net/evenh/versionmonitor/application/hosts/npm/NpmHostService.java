@@ -42,9 +42,9 @@ public class NpmHostService implements HostService, InitializingBean {
   }
 
   @Override
-  public boolean validIdentifier(String identifier) {
-    return !(identifier == null || identifier.isEmpty() || identifier.length() > 214)
-        && !(identifier.startsWith(".") || identifier.startsWith("-") || identifier.startsWith("_"));
+  public boolean validIdentifier(String id) {
+    return !(id == null || id.isEmpty() || id.length() > 214)
+        && !(id.startsWith(".") || id.startsWith("-") || id.startsWith("_"));
   }
 
   @Override
@@ -61,7 +61,8 @@ public class NpmHostService implements HostService, InitializingBean {
   public Optional<? extends Project> getProject(String identifier) {
     log.debug("Processing NPM project with identifier: {}", identifier);
     try {
-      NpmProjectRepresentation npm = http.getForObject(npmRegistry + "/" + identifier, NpmProjectRepresentation.class);
+      NpmProjectRepresentation npm = http
+          .getForObject(npmRegistry + "/" + identifier, NpmProjectRepresentation.class);
       return Optional.of(createNpmProject(npm, identifier));
     } catch (HttpClientErrorException e) {
       log.warn("Got error while fetching NPM project: {}", identifier, e);
@@ -82,8 +83,8 @@ public class NpmHostService implements HostService, InitializingBean {
     List<Release> newReleases = new ArrayList<>();
 
     List<String> existingReleases = project.getReleases().stream()
-      .map(Release::getVersion)
-      .collect(Collectors.toList());
+        .map(Release::getVersion)
+        .collect(Collectors.toList());
 
     try {
       Optional<? extends Project> remoteProject = getProject(project.getIdentifier());

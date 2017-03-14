@@ -1,7 +1,9 @@
 package net.evenh.versionmonitor.api.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
-
+import java.util.List;
+import java.util.Optional;
+import javax.validation.Valid;
 import net.evenh.versionmonitor.api.commands.AddProjectCommand;
 import net.evenh.versionmonitor.api.exceptions.DuplicateProjectException;
 import net.evenh.versionmonitor.api.exceptions.NoProjectsExistsException;
@@ -9,14 +11,13 @@ import net.evenh.versionmonitor.api.exceptions.ProjectNotFoundException;
 import net.evenh.versionmonitor.api.exceptions.SubscriptionAlreadyLinkedToProjectException;
 import net.evenh.versionmonitor.api.exceptions.SubscriptionNotFoundException;
 import net.evenh.versionmonitor.api.exceptions.UnknownProjectTypeException;
+import net.evenh.versionmonitor.application.subscriptions.SubscriptionService;
 import net.evenh.versionmonitor.domain.hosts.HostRegistry;
 import net.evenh.versionmonitor.domain.hosts.HostService;
 import net.evenh.versionmonitor.domain.projects.Project;
 import net.evenh.versionmonitor.domain.projects.ProjectService;
 import net.evenh.versionmonitor.domain.subscriptions.Subscription;
-import net.evenh.versionmonitor.application.subscriptions.SubscriptionService;
 import net.evenh.versionmonitor.infrastructure.View;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +28,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.Optional;
-
-import javax.validation.Valid;
 
 /**
  * Handles CRUD operations for various software projects.
@@ -148,7 +144,7 @@ public class ProjectController {
 
     Project savedProject = projectService.persist(project);
 
-    logger.info("Successfully added subscription for project {}: {}", savedProject, subscriptionMaybe);
+    logger.info("Added subscription for project {}: {}", savedProject, subscriptionMaybe);
 
     return ResponseEntity.ok(savedProject);
   }
@@ -181,7 +177,7 @@ public class ProjectController {
 
     Project savedProject = projectService.persist(project);
 
-    logger.info("Successfully removed subscription for project {}: {}", savedProject, subscriptionMaybe);
+    logger.info("Removed subscription for project {}: {}", savedProject, subscriptionMaybe);
 
     return ResponseEntity.ok(savedProject);
   }

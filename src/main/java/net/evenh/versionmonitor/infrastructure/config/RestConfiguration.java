@@ -21,6 +21,9 @@ public class RestConfiguration {
     return new OkHttpClient().setCache(cache);
   }
 
+  /**
+   * Configures HTTP cache, mainly used for GitHub communication but can be reused.
+   */
   @Bean
   public Cache cache(VersionmonitorConfiguration props) {
     final String randomFileName = UUID.randomUUID().toString();
