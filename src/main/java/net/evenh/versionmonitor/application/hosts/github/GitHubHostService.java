@@ -137,7 +137,7 @@ public class GitHubHostService extends AbstractHealthIndicator
   }
 
   @Override
-  public boolean satisfiedBy(Project project) {
+  public boolean isSatisfiedBy(Project project) {
     return (project instanceof GitHubProject);
   }
 
@@ -145,7 +145,7 @@ public class GitHubHostService extends AbstractHealthIndicator
   public List<Release> check(final Project project) throws Exception {
     Objects.requireNonNull("Supplied GitHub project cannot be null");
 
-    if (!satisfiedBy(project)) {
+    if (!isSatisfiedBy(project)) {
       throw new IllegalArgumentException("Project is not a GitHub project: " + project);
     }
 

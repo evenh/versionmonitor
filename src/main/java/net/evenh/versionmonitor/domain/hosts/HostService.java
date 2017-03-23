@@ -26,7 +26,7 @@ public interface HostService {
    * @param project A {@link Project} subclass.
    * @return True if the given host can process the given project.
    */
-  boolean satisfiedBy(final Project project);
+  boolean isSatisfiedBy(final Project project);
 
   /**
    * An identifier that is unique across the system.

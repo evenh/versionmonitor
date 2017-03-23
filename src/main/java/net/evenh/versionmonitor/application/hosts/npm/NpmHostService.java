@@ -48,7 +48,7 @@ public class NpmHostService implements HostService, InitializingBean {
   }
 
   @Override
-  public boolean satisfiedBy(Project project) {
+  public boolean isSatisfiedBy(Project project) {
     return project instanceof NpmProject;
   }
 
@@ -74,7 +74,7 @@ public class NpmHostService implements HostService, InitializingBean {
   public List<Release> check(Project project) throws Exception {
     Objects.requireNonNull("Supplied NPM project cannot be null");
 
-    if (!satisfiedBy(project)) {
+    if (!isSatisfiedBy(project)) {
       throw new IllegalArgumentException("Project is not a NPM project: " + project);
     }
 

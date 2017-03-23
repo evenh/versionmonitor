@@ -54,7 +54,7 @@ public class DefaultHostRegistry extends AbstractHealthIndicator implements Host
    */
   public Optional<HostService> forProject(Project project) {
     for (HostService host : registry.values()) {
-      if (host.satisfiedBy(project)) {
+      if (host.isSatisfiedBy(project)) {
         return Optional.of(host);
       }
     }
