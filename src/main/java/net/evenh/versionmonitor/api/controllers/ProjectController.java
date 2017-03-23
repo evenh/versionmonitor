@@ -84,15 +84,17 @@ public class ProjectController {
           throw new DuplicateProjectException();
         }
 
-        HostService hostService = registry.getHostService(hostname).get();
-        Optional<? extends Project> project = hostService.getProject(command.getIdentifier());
+        Optional<HostService> hostService = registry.getHostService(hostname);
 
-        if (project.isPresent()) {
-          Project saved = projectService.persist(project.get());
-          logger.info("Successfully added project: {}", saved);
-          return new ResponseEntity<>(saved, HttpStatus.CREATED);
+        if (hostService.isPresent()) {
+          Optional<? extends Project> proj = hostService.get().getProject(command.getIdentifier());
+
+          if (proj.isPresent()) {
+            Project saved = projectService.persist(proj.get());
+            logger.info("Successfully added project: {}", saved);
+            return new ResponseEntity<>(saved, HttpStatus.CREATED);
+          }
         }
-
       }
     }
 
