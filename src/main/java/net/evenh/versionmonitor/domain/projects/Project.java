@@ -2,7 +2,6 @@ package net.evenh.versionmonitor.domain.projects;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -98,10 +97,6 @@ public abstract class Project {
 
   public String getDescription() {
     return description;
-  }
-
-  public void setDescription(Optional<String> description) {
-    this.description = description.get();
   }
 
   public void setDescription(String description) {

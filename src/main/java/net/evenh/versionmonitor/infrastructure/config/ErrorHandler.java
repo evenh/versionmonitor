@@ -22,7 +22,7 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
   private static final Logger logger = LoggerFactory.getLogger(ErrorHandler.class);
   private static final String template = "{}: {} method={}, uri={}, client={}";
 
-  final HttpServletRequest req;
+  private final HttpServletRequest req;
 
   @Autowired
   public ErrorHandler(HttpServletRequest req) {
@@ -39,7 +39,7 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
    * Simple exception handler.
    */
   @ExceptionHandler
-  public ResponseEntity<? extends Object> handleAppException(VersionmonitorException e) {
+  public ResponseEntity<?> handleAppException(VersionmonitorException e) {
     logger.info(template, e.getClass().getSimpleName(), "[NO-MSG]", req.getMethod(),
         req.getRequestURI(), req.getRemoteAddr());
 

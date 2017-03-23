@@ -50,7 +50,7 @@ public class ExceptionHandlingAsyncTaskExecutor implements AsyncTaskExecutor,
     };
   }
 
-  protected void handle(Exception e) {
+  private void handle(Exception e) {
     log.error("Caught async exception", e);
   }
 

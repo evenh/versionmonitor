@@ -48,7 +48,7 @@ public class ReleaseChecker {
 
     projects.forEach(project -> registry.forProject(project).ifPresent(host -> {
       try {
-        host.check(project).forEach(releasesFound::add);
+        releasesFound.addAll(host.check(project));
       } catch (Exception e) {
         logger.warn("Got exception while checking for updates for {}", project, e);
       }

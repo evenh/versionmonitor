@@ -47,7 +47,7 @@ public class ProjectController {
   private SubscriptionService subscriptionService;
 
   @Autowired
-  HostRegistry registry;
+  private HostRegistry registry;
 
   /**
    * Get all existing projects.
@@ -118,7 +118,7 @@ public class ProjectController {
   }
 
   /**
-   * Links a <code>Subscription</code> to a given projet.
+   * Links a <code>Subscription</code> to a given project.
    * @param id The id of the project.
    * @param subscriptionId The subscription id to link.
    */
@@ -150,7 +150,7 @@ public class ProjectController {
   }
 
   /**
-   * Unlinks a <code>Subscription</code> from a given projet.
+   * Unlinks a <code>Subscription</code> from a given project.
    * @param id The id of the project.
    * @param subscriptionId The subscription id to unlink.
    */
