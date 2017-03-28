@@ -1,12 +1,6 @@
-package net.evenh.versionmonitor.application.subscriptions;
+package net.evenh.versionmonitor.domain.subscriptions;
 
 import com.fasterxml.jackson.annotation.JsonView;
-
-import net.evenh.versionmonitor.api.commands.AddSubscriptionCommand;
-import net.evenh.versionmonitor.domain.View;
-
-import org.hibernate.validator.constraints.NotEmpty;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,10 +8,12 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.validation.constraints.NotNull;
+import net.evenh.versionmonitor.infrastructure.View;
+import org.hibernate.validator.constraints.NotEmpty;
 
-@Entity(name = "subscriptions")
+@Entity(name = "subscription")
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class AbstractSubscription implements Subscription {
+public abstract class Subscription {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @JsonView(View.Summary.class)
@@ -33,18 +29,8 @@ public abstract class AbstractSubscription implements Subscription {
   @JsonView(View.Summary.class)
   private String identifier;
 
-  public AbstractSubscription() {
-  }
-
-  public AbstractSubscription(AddSubscriptionCommand command) {
-  }
-
   public Long getId() {
     return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
   }
 
   public String getName() {
@@ -62,4 +48,6 @@ public abstract class AbstractSubscription implements Subscription {
   public void setIdentifier(String identifier) {
     this.identifier = identifier;
   }
+
+  public abstract String getServiceName();
 }

@@ -1,4 +1,4 @@
-package net.evenh.versionmonitor.domain.projects.npm;
+package net.evenh.versionmonitor.application.hosts.npm;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -51,11 +51,11 @@ public class NpmProjectRepresentation {
 
   @Override
   public String toString() {
-    return "NpmProjectRepresentation{" +
-      "name='" + name + '\'' +
-      ", description='" + description + '\'' +
-      ", releases=" + releases +
-      ", time=" + time +
-      '}';
+    return "NpmProjectRepresentation{"
+      + "name='" + name + '\''
+      + ", description='" + description + '\''
+      + ", releases=" + releases
+      + ", time=" + time
+      + '}';
   }
 }

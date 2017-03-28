@@ -1,20 +1,9 @@
-package net.evenh.versionmonitor.application.projects;
+package net.evenh.versionmonitor.domain.projects;
 
 import com.fasterxml.jackson.annotation.JsonView;
-
-import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
-import net.evenh.versionmonitor.domain.View;
-import net.evenh.versionmonitor.domain.releases.Release;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -26,48 +15,71 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
+import net.evenh.versionmonitor.domain.releases.Release;
+import net.evenh.versionmonitor.domain.subscriptions.Subscription;
+import net.evenh.versionmonitor.infrastructure.View;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * A default project which shall be extended.
- *
- * @author Even Holthe
- * @since 2016-01-09
+ * The project class specifies a default software project found on a host.
  */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class AbstractProject implements Project {
-  private static final Logger log = LoggerFactory.getLogger(AbstractProject.class);
+public abstract class Project {
+  private static final Logger log = LoggerFactory.getLogger(Project.class);
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @JsonView(View.Summary.class)
   private Long id;
 
+  /**
+   * Gets the name of a software project.
+   */
   @NotNull
   @JsonView(View.Summary.class)
   private String name;
 
-  @Column(nullable = true)
+  /**
+   * A description of the software project.
+   *
+   * <p><i>Note that all hosts may not have this information.</i>
+   */
   @JsonView(View.Summary.class)
   private String description;
 
+  /**
+   * A unique identifier to identify this project with the host.
+   *
+   * <p>Can be a URL or anything a String can hold.
+   */
   @NotNull
   @JsonView(View.Summary.class)
   private String identifier;
 
+  /**
+   * Releases for this software project.
+   */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   @JoinColumn(name = "project_id")
   @JsonView(View.Detail.class)
   private List<Release> releases;
 
-  @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH}, fetch = FetchType.EAGER)
+  /**
+   * List of notification subscribers for this project.
+   */
+  @ManyToMany(
+      cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH},
+      fetch = FetchType.EAGER
+      )
   @JsonView(View.Detail.class)
-  private Set<AbstractSubscription> subscriptions;
+  private Set<Subscription> subscriptions;
 
-  public AbstractProject() {
+  public Project() {
   }
 
-  public AbstractProject(String identifier) {
+  public Project(String identifier) {
     this.identifier = identifier;
   }
 
@@ -75,7 +87,6 @@ public abstract class AbstractProject implements Project {
     return id;
   }
 
-  @Override
   public String getName() {
     return name;
   }
@@ -84,20 +95,14 @@ public abstract class AbstractProject implements Project {
     this.name = name;
   }
 
-  @Override
   public String getDescription() {
     return description;
-  }
-
-  public void setDescription(Optional<String> description) {
-    this.description = description.get();
   }
 
   public void setDescription(String description) {
     this.description = description;
   }
 
-  @Override
   public String getIdentifier() {
     return identifier;
   }
@@ -106,7 +111,6 @@ public abstract class AbstractProject implements Project {
     this.identifier = identifier;
   }
 
-  @Override
   public List<Release> getReleases() {
     return releases;
   }
@@ -115,19 +119,20 @@ public abstract class AbstractProject implements Project {
     this.releases = releases;
   }
 
-  @Override
   public void addRelease(Release release) {
     releases.add(release);
   }
 
-  public void setSubscriptions(Set<AbstractSubscription> subscriptions) {
+  public void setSubscriptions(Set<Subscription> subscriptions) {
     this.subscriptions = subscriptions;
   }
 
-  @Override
-  public boolean addSubscription(AbstractSubscription subscription) {
+  /**
+   * Add a {@link Subscription} to this project.
+   */
+  public boolean addSubscription(Subscription subscription) {
     if (subscriptions.contains(subscription)) {
-      log.info("Subscription does already exist - won't add: {}", subscription);
+      log.debug("Subscription does already exist - won't add: {}", subscription);
       return false;
     } else {
       subscriptions.add(subscription);
@@ -136,10 +141,12 @@ public abstract class AbstractProject implements Project {
     return true;
   }
 
-  @Override
-  public boolean removeSubscription(AbstractSubscription subscription) {
+  /**
+   * Remove a {@link Subscription} from this project.
+   */
+  public boolean removeSubscription(Subscription subscription) {
     if (!subscriptions.contains(subscription)) {
-      log.info("Subscription does not exist - won't remove: {}", subscription);
+      log.debug("Subscription does not exist - won't remove: {}", subscription);
       return false;
     } else {
       subscriptions.remove(subscription);
@@ -148,10 +155,14 @@ public abstract class AbstractProject implements Project {
     return true;
   }
 
-  @Override
-  public Set<AbstractSubscription> getSubscriptions() {
+  public Set<Subscription> getSubscriptions() {
     return subscriptions;
   }
+
+  /**
+   * Returns the URL of this project on a specific host.
+   */
+  public abstract String getProjectUrl();
 
   @Override
   public String toString() {

@@ -1,27 +1,17 @@
-package net.evenh.versionmonitor.application.hosts.impl;
-
-import net.evenh.versionmonitor.application.hosts.HostRegistry;
-import net.evenh.versionmonitor.application.hosts.HostService;
-import net.evenh.versionmonitor.application.projects.AbstractProject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.actuate.health.AbstractHealthIndicator;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.stereotype.Component;
+package net.evenh.versionmonitor.domain.hosts;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import net.evenh.versionmonitor.domain.projects.Project;
+import org.springframework.boot.actuate.health.AbstractHealthIndicator;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.stereotype.Component;
 
 @Component
 public class DefaultHostRegistry extends AbstractHealthIndicator implements HostRegistry {
-  private static final Logger logger = LoggerFactory.getLogger(HostRegistry.class);
   private final Map<String, HostService> registry = new HashMap<>();
-
-  private DefaultHostRegistry() {
-  }
 
   /**
    * Gets a particular host service by it's identifier.
@@ -56,16 +46,14 @@ public class DefaultHostRegistry extends AbstractHealthIndicator implements Host
     return registry.containsKey(hostIdentifier);
   }
 
-  public Optional<HostService> forProject(AbstractProject project) {
-    for (HostService host : registry.values()) {
-      if (host.satisfiedBy(project)) {
-        return Optional.of(host);
-      }
-    }
-
-    return Optional.empty();
+  /**
+   * Find the correct {@link HostService} to use for a given {@link Project}.
+   */
+  public Optional<HostService> forProject(Project project) {
+    return registry.values().stream()
+      .filter(service -> service.isSatisfiedBy(project))
+      .findFirst();
   }
-
 
   @Override
   protected void doHealthCheck(Health.Builder builder) throws Exception {

@@ -1,16 +1,15 @@
 package net.evenh.versionmonitor.infrastructure.config.async;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.AsyncTaskExecutor;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-
 public class ExceptionHandlingAsyncTaskExecutor implements AsyncTaskExecutor,
-  InitializingBean, DisposableBean {
+    InitializingBean, DisposableBean {
 
   private final Logger log = LoggerFactory.getLogger(ExceptionHandlingAsyncTaskExecutor.class);
 
@@ -51,7 +50,7 @@ public class ExceptionHandlingAsyncTaskExecutor implements AsyncTaskExecutor,
     };
   }
 
-  protected void handle(Exception e) {
+  private void handle(Exception e) {
     log.error("Caught async exception", e);
   }
 

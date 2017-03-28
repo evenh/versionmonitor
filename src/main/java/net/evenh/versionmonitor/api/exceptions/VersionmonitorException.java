@@ -3,7 +3,7 @@ package net.evenh.versionmonitor.api.exceptions;
 import org.springframework.http.HttpStatus;
 
 public class VersionmonitorException extends RuntimeException {
-  private HttpStatus statusCode;
+  private final HttpStatus statusCode;
 
   public VersionmonitorException() {
     this(HttpStatus.BAD_REQUEST);

@@ -1,4 +1,4 @@
-package net.evenh.versionmonitor.domain.projects.npm;
+package net.evenh.versionmonitor.application.hosts.npm;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -27,9 +27,9 @@ public class NpmReleaseRepresentation {
 
   @Override
   public String toString() {
-    return "npm-release{" +
-      "version='" + version + '\'' +
-      ", released='" + released + '\'' +
-      '}';
+    return "npm-release{"
+      + "version='" + version + '\''
+      + ", released='" + released + '\''
+      + '}';
   }
 }

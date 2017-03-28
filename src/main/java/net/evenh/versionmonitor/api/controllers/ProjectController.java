@@ -1,7 +1,9 @@
 package net.evenh.versionmonitor.api.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
-
+import java.util.List;
+import java.util.Optional;
+import javax.validation.Valid;
 import net.evenh.versionmonitor.api.commands.AddProjectCommand;
 import net.evenh.versionmonitor.api.exceptions.DuplicateProjectException;
 import net.evenh.versionmonitor.api.exceptions.NoProjectsExistsException;
@@ -9,14 +11,13 @@ import net.evenh.versionmonitor.api.exceptions.ProjectNotFoundException;
 import net.evenh.versionmonitor.api.exceptions.SubscriptionAlreadyLinkedToProjectException;
 import net.evenh.versionmonitor.api.exceptions.SubscriptionNotFoundException;
 import net.evenh.versionmonitor.api.exceptions.UnknownProjectTypeException;
-import net.evenh.versionmonitor.application.hosts.HostRegistry;
-import net.evenh.versionmonitor.application.hosts.HostService;
-import net.evenh.versionmonitor.application.projects.AbstractProject;
-import net.evenh.versionmonitor.application.projects.ProjectService;
-import net.evenh.versionmonitor.application.subscriptions.AbstractSubscription;
 import net.evenh.versionmonitor.application.subscriptions.SubscriptionService;
-import net.evenh.versionmonitor.domain.View;
-
+import net.evenh.versionmonitor.domain.hosts.HostRegistry;
+import net.evenh.versionmonitor.domain.hosts.HostService;
+import net.evenh.versionmonitor.domain.projects.Project;
+import net.evenh.versionmonitor.domain.projects.ProjectService;
+import net.evenh.versionmonitor.domain.subscriptions.Subscription;
+import net.evenh.versionmonitor.infrastructure.View;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +28,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.Optional;
-
-import javax.validation.Valid;
 
 /**
  * Handles CRUD operations for various software projects.
@@ -51,7 +47,7 @@ public class ProjectController {
   private SubscriptionService subscriptionService;
 
   @Autowired
-  HostRegistry registry;
+  private HostRegistry registry;
 
   /**
    * Get all existing projects.
@@ -61,7 +57,7 @@ public class ProjectController {
   @JsonView(View.Summary.class)
   @RequestMapping(method = RequestMethod.GET)
   public ResponseEntity getAllProjects() {
-    List<AbstractProject> projects = projectService.findAll();
+    List<Project> projects = projectService.findAll();
 
     if (projects.isEmpty()) {
       throw new NoProjectsExistsException();
@@ -88,15 +84,17 @@ public class ProjectController {
           throw new DuplicateProjectException();
         }
 
-        HostService hostService = registry.getHostService(hostname).get();
-        Optional<? extends AbstractProject> project = hostService.getProject(command.getIdentifier());
+        Optional<HostService> hostService = registry.getHostService(hostname);
 
-        if (project.isPresent()) {
-          AbstractProject saved = projectService.persist(project.get());
-          logger.info("Successfully added project: {}", saved);
-          return new ResponseEntity<>(saved, HttpStatus.CREATED);
+        if (hostService.isPresent()) {
+          Optional<? extends Project> proj = hostService.get().getProject(command.getIdentifier());
+
+          if (proj.isPresent()) {
+            Project saved = projectService.persist(proj.get());
+            logger.info("Successfully added project: {}", saved);
+            return new ResponseEntity<>(saved, HttpStatus.CREATED);
+          }
         }
-
       }
     }
 
@@ -106,13 +104,13 @@ public class ProjectController {
   /**
    * Gets a single project by primary key.
    *
-   * @param id The primary key of an <code>AbstractProject</code>.
+   * @param id The primary key of an <code>Project</code>.
    * @return The project found by primary key on success, a JSON error response otherwise.
    */
   @JsonView(View.Detail.class)
   @RequestMapping(value = "/{id}", method = RequestMethod.GET)
   public ResponseEntity getOne(@PathVariable Long id) {
-    Optional<AbstractProject> project = projectService.findOne(id);
+    Optional<Project> project = projectService.findOne(id);
 
     if (!project.isPresent()) {
       throw new ProjectNotFoundException();
@@ -122,15 +120,15 @@ public class ProjectController {
   }
 
   /**
-   * Links a <code>AbstractSubscription</code> to a given projet.
+   * Links a <code>Subscription</code> to a given project.
    * @param id The id of the project.
    * @param subscriptionId The subscription id to link.
    */
   @JsonView(View.Summary.class)
   @RequestMapping(value = "/{id}/subscribe/{subscriptionId}", method = RequestMethod.POST)
   public ResponseEntity addSubscriber(@PathVariable Long id, @PathVariable Long subscriptionId) {
-    Optional<AbstractSubscription> subscriptionMaybe = subscriptionService.findOne(subscriptionId);
-    Optional<AbstractProject> projectMaybe = projectService.findOne(id);
+    Optional<Subscription> subscriptionMaybe = subscriptionService.findOne(subscriptionId);
+    Optional<Project> projectMaybe = projectService.findOne(id);
 
     if (!projectMaybe.isPresent()) {
       throw new ProjectNotFoundException();
@@ -140,29 +138,29 @@ public class ProjectController {
       throw new SubscriptionNotFoundException();
     }
 
-    AbstractProject project = projectMaybe.get();
+    Project project = projectMaybe.get();
 
     if (!project.addSubscription(subscriptionMaybe.get())) {
       throw new SubscriptionAlreadyLinkedToProjectException();
     }
 
-    AbstractProject savedProject = projectService.persist(project);
+    Project savedProject = projectService.persist(project);
 
-    logger.info("Successfully added subscription for project {}: {}", savedProject, subscriptionMaybe);
+    logger.info("Added subscription for project {}: {}", savedProject, subscriptionMaybe);
 
     return ResponseEntity.ok(savedProject);
   }
 
   /**
-   * Unlinks a <code>AbstractSubscription</code> from a given projet.
+   * Unlinks a <code>Subscription</code> from a given project.
    * @param id The id of the project.
    * @param subscriptionId The subscription id to unlink.
    */
   @JsonView(View.Summary.class)
   @RequestMapping(value = "/{id}/unsubscribe/{subscriptionId}", method = RequestMethod.POST)
   public ResponseEntity removeSubscriber(@PathVariable Long id, @PathVariable Long subscriptionId) {
-    Optional<AbstractSubscription> subscriptionMaybe = subscriptionService.findOne(subscriptionId);
-    Optional<AbstractProject> projectMaybe = projectService.findOne(id);
+    Optional<Subscription> subscriptionMaybe = subscriptionService.findOne(subscriptionId);
+    Optional<Project> projectMaybe = projectService.findOne(id);
 
     if (!projectMaybe.isPresent()) {
       throw new ProjectNotFoundException();
@@ -173,15 +171,15 @@ public class ProjectController {
     }
 
 
-    AbstractProject project = projectMaybe.get();
+    Project project = projectMaybe.get();
 
     if (!project.removeSubscription(subscriptionMaybe.get())) {
       throw new SubscriptionNotFoundException();
     }
 
-    AbstractProject savedProject = projectService.persist(project);
+    Project savedProject = projectService.persist(project);
 
-    logger.info("Successfully removed subscription for project {}: {}", savedProject, subscriptionMaybe);
+    logger.info("Removed subscription for project {}: {}", savedProject, subscriptionMaybe);
 
     return ResponseEntity.ok(savedProject);
   }
@@ -189,12 +187,12 @@ public class ProjectController {
   /**
    * Deletes a project by primary key.
    *
-   * @param id The primary key of an <code>AbstractProject</code>.
+   * @param id The primary key of an <code>Project</code>.
    * @return HTTP 204 on success, error message otherwise.
    */
   @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
   public ResponseEntity deleteOne(@PathVariable Long id) {
-    Optional<AbstractProject> project = projectService.findOne(id);
+    Optional<Project> project = projectService.findOne(id);
 
     if (!project.isPresent()) {
       throw new ProjectNotFoundException();

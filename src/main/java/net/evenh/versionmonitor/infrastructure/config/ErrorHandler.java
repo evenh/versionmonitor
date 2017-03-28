@@ -1,10 +1,10 @@
 package net.evenh.versionmonitor.infrastructure.config;
 
 import com.google.common.collect.ImmutableMap;
-
+import java.util.Date;
+import javax.servlet.http.HttpServletRequest;
 import net.evenh.versionmonitor.api.ValidationError;
 import net.evenh.versionmonitor.api.exceptions.VersionmonitorException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,17 +17,17 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-
 @ControllerAdvice
 public class ErrorHandler extends ResponseEntityExceptionHandler {
-  private final static Logger logger = LoggerFactory.getLogger(ErrorHandler.class);
-  private final static String loggingTemplate = "{}: {} method={}, uri={}, client={}";
+  private static final Logger logger = LoggerFactory.getLogger(ErrorHandler.class);
+  private static final String template = "{}: {} method={}, uri={}, client={}";
+
+  private final HttpServletRequest req;
 
   @Autowired
-  HttpServletRequest request;
+  public ErrorHandler(HttpServletRequest req) {
+    this.req = req;
+  }
 
   @ExceptionHandler
   public ResponseEntity<Void> handleUncaughtException(Exception e) {
@@ -35,32 +35,38 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
+  /**
+   * Simple exception handler.
+   */
   @ExceptionHandler
-  public ResponseEntity<? extends Object> handleAppException(VersionmonitorException e) {
-    logger.info(loggingTemplate,
-      e.getClass().getSimpleName(),
-      "[NO-MSG]",
-      request.getMethod(),
-      request.getRequestURI(),
-      request.getRemoteAddr());
+  public ResponseEntity<?> handleAppException(VersionmonitorException e) {
+    logger.info(template, e.getClass().getSimpleName(), "[NO-MSG]", req.getMethod(),
+        req.getRequestURI(), req.getRemoteAddr());
 
     return ResponseEntity.status(e.getStatusCode())
-      .body(ImmutableMap.of("code", VersionmonitorException.errorCode(e.getClass()), "timestamp", new Date()));
+      .body(ImmutableMap.of(
+        "code", VersionmonitorException.errorCode(e.getClass()),
+        "timestamp", new Date()
+        )
+      );
   }
 
   @Override
-  protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
+  protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body,
+      HttpHeaders headers, HttpStatus status, WebRequest request) {
     logWarning("unable to process request", ex);
     return super.handleExceptionInternal(ex, body, headers, status, request);
   }
 
   @Override
-  protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+  protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+      HttpHeaders headers, HttpStatus status, WebRequest request) {
     logWarning("validation error", ex);
     return new ResponseEntity<>(new ValidationError(ex.getBindingResult()), status);
   }
 
   private void logWarning(String message, Exception e) {
-    logger.warn(loggingTemplate, e.getClass().getSimpleName(), message, request.getMethod(), request.getRequestURI(), request.getRemoteAddr(), e);
+    logger.warn(template, e.getClass().getSimpleName(), message, req.getMethod(),
+        req.getRequestURI(), req.getRemoteAddr(), e);
   }
 }

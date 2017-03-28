@@ -1,14 +1,11 @@
-package net.evenh.versionmonitor.application.hosts;
-
-import net.evenh.versionmonitor.application.projects.AbstractProject;
+package net.evenh.versionmonitor.domain.hosts;
 
 import java.util.Optional;
 import java.util.Set;
+import net.evenh.versionmonitor.domain.projects.Project;
 
 /**
  * A registry of available hosts.
- *
- * @author Even Holthe
  */
 public interface HostRegistry {
   /**
@@ -18,13 +15,28 @@ public interface HostRegistry {
    */
   Optional<HostService> getHostService(final String hostIdentifier);
 
+  /**
+   * Register a particular host service with the registry.
+   */
   void register(final HostService service);
 
+  /**
+   * Unregister a particular host service from the registry.
+   */
   void unregister(final HostService service);
 
+  /**
+   * Unregister a particular host service from the registry.
+   */
   void unregister(final String serviceIdentifier);
 
+  /**
+   * Gets all available hosts.
+   */
   Set<String> getHosts();
 
-  Optional<HostService> forProject(AbstractProject project);
+  /**
+   * Lookup a given host service implementation for a project.
+   */
+  Optional<HostService> forProject(Project project);
 }

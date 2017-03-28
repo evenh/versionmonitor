@@ -1,0 +1,31 @@
+version: '2'
+
+services:
+  mariadb:
+    restart: always
+    image: mariadb:10.1
+    ports:
+    - "3306:3306"
+    environment:
+    - MYSQL_DATABASE=versions
+    - MYSQL_USER=versionmonitor
+    - MYSQL_PASSWORD=super-secret-pw
+    - MYSQL_RANDOM_ROOT_PASSWORD=true
+    volumes:
+    - ./compose-setup/mariadb:/var/lib/mysql:Z
+
+  versionmonitor:
+    restart: always
+    image: evenh/versionmonitor:0.0.1-SNAPSHOT
+    depends_on:
+    - mariadb
+    ports:
+    - "8080:8080"
+    volumes:
+    - ./compose-setup/versionmonitor/logs:/var/log/versionmonitor:Z
+    environment:
+    - SPRING_PROFILES_ACTIVE=prod
+    - SPRING_DATASOURCE_URL=jdbc:mysql://mariadb:3306/versions?useUnicode=true&characterEncoding=utf8
+    - SPRING_DATASOURCE_USERNAME=versionmonitor
+    - SPRING_DATASOURCE_PASSWORD=super-secret-pw
+    # - VERSIONMONITOR_GITHUB_OAUTH_TOKEN=yourTokenHere

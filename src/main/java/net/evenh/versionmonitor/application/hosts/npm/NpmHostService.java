@@ -1,14 +1,16 @@
-package net.evenh.versionmonitor.application.hosts.impl;
+package net.evenh.versionmonitor.application.hosts.npm;
 
-import net.evenh.versionmonitor.application.hosts.HostRegistry;
-import net.evenh.versionmonitor.application.hosts.HostService;
-import net.evenh.versionmonitor.application.projects.AbstractProject;
-import net.evenh.versionmonitor.application.projects.ProjectService;
-import net.evenh.versionmonitor.application.releases.ReleaseRepository;
-import net.evenh.versionmonitor.domain.projects.npm.NpmProject;
-import net.evenh.versionmonitor.domain.projects.npm.NpmProjectRepresentation;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import net.evenh.versionmonitor.domain.hosts.HostRegistry;
+import net.evenh.versionmonitor.domain.hosts.HostService;
+import net.evenh.versionmonitor.domain.projects.Project;
+import net.evenh.versionmonitor.domain.projects.ProjectService;
 import net.evenh.versionmonitor.domain.releases.Release;
-
+import net.evenh.versionmonitor.domain.releases.ReleaseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -16,14 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static net.evenh.versionmonitor.domain.releases.Release.ReleaseBuilder.builder;
 
 @Service("npmHostService")
 public class NpmHostService implements HostService, InitializingBean {
@@ -48,13 +42,13 @@ public class NpmHostService implements HostService, InitializingBean {
   }
 
   @Override
-  public boolean validIdentifier(String identifier) {
-    return !(identifier == null || identifier.isEmpty() || identifier.length() > 214)
-        && !(identifier.startsWith(".") || identifier.startsWith("-") || identifier.startsWith("_"));
+  public boolean validIdentifier(String id) {
+    return !(id == null || id.isEmpty() || id.length() > 214)
+        && !(id.startsWith(".") || id.startsWith("-") || id.startsWith("_"));
   }
 
   @Override
-  public boolean satisfiedBy(AbstractProject project) {
+  public boolean isSatisfiedBy(Project project) {
     return project instanceof NpmProject;
   }
 
@@ -64,10 +58,11 @@ public class NpmHostService implements HostService, InitializingBean {
   }
 
   @Override
-  public Optional<? extends AbstractProject> getProject(String identifier) {
+  public Optional<? extends Project> getProject(String identifier) {
     log.debug("Processing NPM project with identifier: {}", identifier);
     try {
-      NpmProjectRepresentation npm = http.getForObject(npmRegistry + "/" + identifier, NpmProjectRepresentation.class);
+      NpmProjectRepresentation npm = http
+          .getForObject(npmRegistry + "/" + identifier, NpmProjectRepresentation.class);
       return Optional.of(createNpmProject(npm, identifier));
     } catch (HttpClientErrorException e) {
       log.warn("Got error while fetching NPM project: {}", identifier, e);
@@ -76,10 +71,10 @@ public class NpmHostService implements HostService, InitializingBean {
   }
 
   @Override
-  public List<Release> check(AbstractProject project) throws Exception {
+  public List<Release> check(Project project) throws Exception {
     Objects.requireNonNull("Supplied NPM project cannot be null");
 
-    if (!satisfiedBy(project)) {
+    if (!isSatisfiedBy(project)) {
       throw new IllegalArgumentException("Project is not a NPM project: " + project);
     }
 
@@ -88,11 +83,11 @@ public class NpmHostService implements HostService, InitializingBean {
     List<Release> newReleases = new ArrayList<>();
 
     List<String> existingReleases = project.getReleases().stream()
-      .map(Release::getVersion)
-      .collect(Collectors.toList());
+        .map(Release::getVersion)
+        .collect(Collectors.toList());
 
     try {
-      Optional<? extends AbstractProject> remoteProject = getProject(project.getIdentifier());
+      Optional<? extends Project> remoteProject = getProject(project.getIdentifier());
 
       if (!remoteProject.isPresent()) {
         log.warn(prefix + "Could not read project {} from NPM.", project.getIdentifier());
@@ -133,11 +128,19 @@ public class NpmHostService implements HostService, InitializingBean {
     npm.getReleases().forEach((key, value) -> {
       value.setReleased(npm.getTime().get(key));
 
-      releases.add(builder().fromNpm(value, identifier).build());
+      releases.add(mapToRelease(value, identifier));
     });
 
     project.setReleases(releases);
 
     return project;
+  }
+
+  private Release mapToRelease(NpmReleaseRepresentation release, String identifier) {
+    return Release.builder()
+      .withVersion(release.getVersion())
+      .withUrl("https://www.npmjs.com/package/" + identifier)
+      .withCreatedAt(release.getReleased())
+      .build();
   }
 }

@@ -1,14 +1,16 @@
 package net.evenh.versionmonitor.api;
 
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
 public class ValidationError {
   public List<FieldValidationError> errors;
 
+  /**
+   * Construct a validation error from a {@link BindingResult} provided by Spring.
+   */
   public ValidationError(BindingResult result) {
     this(result.getFieldErrors().stream()
       .map(FieldValidationError::new)
@@ -19,7 +21,8 @@ public class ValidationError {
     this.errors = errors;
   }
 
-  private ValidationError() {}
+  private ValidationError() {
+  }
 
   private static final class FieldValidationError {
     public String field;
@@ -36,6 +39,7 @@ public class ValidationError {
       this(error.getField(), error.getCode(), error.getDefaultMessage());
     }
 
-    private FieldValidationError() {}
+    private FieldValidationError() {
+    }
   }
 }
