@@ -13,9 +13,6 @@ import org.springframework.stereotype.Component;
 public class DefaultHostRegistry extends AbstractHealthIndicator implements HostRegistry {
   private final Map<String, HostService> registry = new HashMap<>();
 
-  private DefaultHostRegistry() {
-  }
-
   /**
    * Gets a particular host service by it's identifier.
    *
@@ -53,13 +50,9 @@ public class DefaultHostRegistry extends AbstractHealthIndicator implements Host
    * Find the correct {@link HostService} to use for a given {@link Project}.
    */
   public Optional<HostService> forProject(Project project) {
-    for (HostService host : registry.values()) {
-      if (host.isSatisfiedBy(project)) {
-        return Optional.of(host);
-      }
-    }
-
-    return Optional.empty();
+    return registry.values().stream()
+      .filter(service -> service.isSatisfiedBy(project))
+      .findFirst();
   }
 
   @Override

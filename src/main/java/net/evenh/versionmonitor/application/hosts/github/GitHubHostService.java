@@ -64,9 +64,6 @@ public class GitHubHostService extends AbstractHealthIndicator
 
   private GitHub gitHub;
 
-  private GitHubHostService() {
-  }
-
   /**
    * Performs the initial connection to GitHub.
    *

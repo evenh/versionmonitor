@@ -13,6 +13,9 @@ import net.evenh.versionmonitor.infrastructure.View;
 @Entity
 @Table(name = "subscription_slack")
 public class SlackSubscription extends Subscription {
+  @JsonView(View.Detail.class)
+  private String channel;
+
   public SlackSubscription() {
     super();
   }
@@ -25,9 +28,6 @@ public class SlackSubscription extends Subscription {
     this.setName(command.getName());
     this.setChannel(command.getChannel());
   }
-
-  @JsonView(View.Detail.class)
-  private String channel;
 
   public String getChannel() {
     return channel;

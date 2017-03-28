@@ -29,9 +29,6 @@ public abstract class Subscription {
   @JsonView(View.Summary.class)
   private String identifier;
 
-  public Subscription() {
-  }
-
   public Long getId() {
     return id;
   }

@@ -10,9 +10,6 @@ import net.evenh.versionmonitor.domain.projects.Project;
 @Entity
 @Table(name = "project_npm")
 public class NpmProject extends Project {
-  public NpmProject() {
-  }
-
   @Override
   public String getProjectUrl() {
     return "https://www.npmjs.com/package/" + getIdentifier();

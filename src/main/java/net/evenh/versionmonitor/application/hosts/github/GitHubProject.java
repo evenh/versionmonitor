@@ -10,9 +10,6 @@ import net.evenh.versionmonitor.domain.projects.Project;
 @Entity
 @Table(name = "project_github")
 public class GitHubProject extends Project {
-  public GitHubProject() {
-  }
-
   @Override
   public String getProjectUrl() {
     return "https://github.com/" + getIdentifier();
