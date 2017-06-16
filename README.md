@@ -1,4 +1,5 @@
 # versionmonitor
+![Screenshot](http://i.imgur.com/BfEtG5w.png)
 
 > A server side watcher app for monitoring new versions of your software dependencies.
 
