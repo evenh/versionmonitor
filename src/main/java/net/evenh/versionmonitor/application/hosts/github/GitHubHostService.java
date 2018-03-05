@@ -2,8 +2,6 @@ package net.evenh.versionmonitor.application.hosts.github;
 
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.OkUrlFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,12 +18,14 @@ import net.evenh.versionmonitor.domain.projects.ProjectService;
 import net.evenh.versionmonitor.domain.releases.Release;
 import net.evenh.versionmonitor.domain.releases.ReleaseRepository;
 import net.evenh.versionmonitor.infrastructure.config.VersionmonitorConfiguration;
+import okhttp3.OkHttpClient;
+import okhttp3.OkUrlFactory;
 import org.kohsuke.github.GHRateLimit;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTag;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
-import org.kohsuke.github.extras.OkHttpConnector;
+import org.kohsuke.github.extras.OkHttp3Connector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -86,7 +86,7 @@ public class GitHubHostService extends AbstractHealthIndicator
       gitHub = GitHubBuilder
         .fromEnvironment()
         .withOAuthToken(authToken)
-        .withConnector(new OkHttpConnector(new OkUrlFactory(httpClient)))
+        .withConnector(new OkHttp3Connector(new OkUrlFactory(httpClient)))
         .build();
     } catch (IOException e) {
       log.warn("Caught exception while establishing a connection to GitHub", e);

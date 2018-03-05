@@ -22,7 +22,7 @@ public class ProjectService {
    * Finds a project by id.
    */
   public Optional<Project> findOne(Long id) {
-    return Optional.ofNullable(repository.findOne(id));
+    return repository.findById(id);
   }
 
   /**

@@ -28,7 +28,7 @@ public class SubscriptionService {
    * Finds a subscription by id.
    */
   public Optional<Subscription> findOne(Long id) {
-    return Optional.ofNullable(repository.findOne(id));
+    return repository.findById(id);
   }
 
   /**

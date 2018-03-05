@@ -1,11 +1,12 @@
 package net.evenh.versionmonitor.infrastructure.config;
 
-import com.squareup.okhttp.Cache;
-import com.squareup.okhttp.OkHttpClient;
 import java.io.File;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import okhttp3.Cache;
+import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.client.OkHttpClientHttpRequestFactory;
+import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -13,12 +14,17 @@ import org.springframework.web.client.RestTemplate;
 public class RestConfiguration {
   @Bean
   public RestTemplate okHttpRestTemplate(OkHttpClient client) {
-    return new RestTemplate(new OkHttpClientHttpRequestFactory(client));
+    return new RestTemplate(new OkHttp3ClientHttpRequestFactory(client));
   }
 
   @Bean
   public OkHttpClient okHttpClient(Cache cache) {
-    return new OkHttpClient().setCache(cache);
+    return new OkHttpClient.Builder()
+      .cache(cache)
+      .connectTimeout(30, TimeUnit.SECONDS)
+      .followRedirects(true)
+      .readTimeout(5, TimeUnit.MINUTES)
+      .build();
   }
 
   /**
