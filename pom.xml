@@ -16,7 +16,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <run.addResources>false</run.addResources>
-    <spring-boot.version>2.0.2.RELEASE</spring-boot.version>
+    <spring-boot.version>2.0.4.RELEASE</spring-boot.version>
     <okhttp.version>3.11.0</okhttp.version>
     <jacoco.version>0.8.0</jacoco.version>
     <docker.image.prefix>evenh</docker.image.prefix>
