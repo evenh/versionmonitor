@@ -1,7 +1,7 @@
 package net.evenh.versionmonitor.api.commands;
 
 import javax.validation.constraints.NotNull;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 public class AddSubscriptionCommand {
   @NotNull

@@ -9,7 +9,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.validation.constraints.NotNull;
 import net.evenh.versionmonitor.infrastructure.View;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 @Entity(name = "subscription")
 @Inheritance(strategy = InheritanceType.JOINED)
