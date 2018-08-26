@@ -1,4 +1,4 @@
-FROM openjdk:8-jre
+FROM openjdk:10-jre
 
 COPY versionmonitor*.jar app.jar
 RUN sh -c 'touch /app.jar'
