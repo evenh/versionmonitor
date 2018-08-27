@@ -2,14 +2,13 @@ language: java
 jdk: openjdk10
 services:
 - docker
-after_success:
-- if [ "$TRAVIS_BRANCH" == "master" ]; then
-  mvn clean package
-  docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
-  docker push evenh/versionmonitor:latest;
-  fi
 dd:
 - secure: Zo0UgYROztfJGB183ohHS3COYXb9DA9Huo3BXTEK0HLz3+EJyrGgWArMODCRdmot52pdvWNw0IXkF2xdRHzt3/QCoKeECvKuvLbbOukYRJzXF1JWe8GpkN52Y+c2zdP3VhBFes/sfF6ESEoFQeIlDi7vz3KkoqdgOn6NQDKyFE8fSh8uAz/yLaHYLF/VkbJCLUuqDIG4wuO4QLUWMeZJ15XVZosR9OjhosnndErwImCvYs8D4BoQ6OHmDBOnNXNT4brv65YGUP2YuXBRcYX9FO2O4s384k+QRUkN2j8MJb8ftcKp2UCfkmnRcNZNkxMtl7EN+r8avpcBZqihxm3oNc2Pai6H89hsUfp95Q0CM7o8+WQSLQm68/CTjz/uOrvAunzGBd8sAOJs1+6cipGRXacOBvnm8+JP4wKqrB4bilK9g4lVTr2o9KYmtYndWwAxQnoOon9DETitK97w3SNDXiPcLMnCIb1k1exVsHlsvXw8BGdphWI5tGCvkaHo6hO9Q41STfekHMVsox3y+tI+PfbMIfQb8LDMY7CyqLfGqMpY7u6imhNYSSl8/ndm1JByej6ZF2Zu6RNocTletQh04/YC4DnCmkR/d5L+ES1i9i6S5/z/d71+aJrr+ikdHqJ82yKKeDmvJiE19pSi5R5N0vTAThMMzD0N2+KvnaGj3rA=
 - secure: UMgrrxjAOgwHlrVwJXjC/tTHpefS/NrzTisDCZrZzviZ+kngVmlybQUyOQVDihX0o3b1VAU/8QVB74VF368mEq09JLSG2QYHbF+l+fHkHPveC24n8eBjmpkOKzJ/7UEeeT4epmJFRs8ZfG/rJwBvfO5QhhclE0oyq2epiDHbj03N1E7zB6XkqmiGOLa+ffzktyTjG6PZ2oBJkKe+QevPo4WG3W4NvfUl5XRFsQvi6i7PN/vrzSnLOSDmqzGEzOo44LvCOjUXG30PTgYUAG+kRVXEGQsp4q4J9VouHAlSUGpEsc0kCP5093cVtHxnfG2VfP6CSDFBJNQFCu2y8JZTiFrCsq1c4vVcRwmxFaPTZ203OqCqVjqD0tpWQZI2uNi8VFTiv7ykVJqur7Gpy9ujblSU+Sa7VJAG0eQNR04UAmiDV0x2Z5g9/7g8DVFQZ0m0u7FnifQeZyKX17o9TINCAPtj+khWbTT+96NtywzTuFZFcPGdHPvu1yLNX1WMNrSQLsqkexTrONddCmTA6rqTkmiz5MFo1aJWgE/Z++pkTmHkVyrhwRoLPckhbiLLykQ7+PDq0qL45hct9kwnccMUtjsP/IDEtCVvyRbFeaWhrFsaC69ZH6dlALJzesS4ZaBcOLnD42eOxwmSEhoT7jpHBHM2bDO8NVocU8/a+uhPrcc=
 after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+  mvn clean package
+  docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+  docker push evenh/versionmonitor:latest;
+  fi
   - bash <(curl -s https://copilot.blackducksoftware.com/ci/travis/scripts/upload)
