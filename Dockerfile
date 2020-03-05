@@ -1,4 +1,4 @@
-FROM openjdk:10-jre
+FROM openjdk:11-jre
 
 ENTRYPOINT ["/usr/bin/java", "-jar", "/usr/share/versionmonitor/app.jar"]
 
