@@ -1,0 +1,25 @@
+version: 2
+updates:
+- package-ecosystem: maven
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "02:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: org.kohsuke:github-api
+    versions:
+    - "1.122"
+    - "1.124"
+    - "1.125"
+    - "1.127"
+  - dependency-name: org.springframework.boot:spring-boot-starter-parent
+    versions:
+    - 2.4.2
+    - 2.4.4
+  - dependency-name: com.squareup.okhttp3:okhttp-urlconnection
+    versions:
+    - 4.9.0
+  - dependency-name: com.squareup.okhttp3:okhttp
+    versions:
+    - 4.9.0
